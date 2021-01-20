@@ -3,6 +3,7 @@
 #' @param PARAMETERS
 #'
 #' @return
+#' @export
 #'
 #' @examples
 .read.gtf <- function(PARAMETERS){

@@ -4,6 +4,7 @@
 #' @param ANNOTATION
 #'
 #' @return
+#' @export
 #'
 #' @examples
 .get.gene.anno <- function(PARAMETERS,ANNOTATION) {

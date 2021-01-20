@@ -17,17 +17,23 @@ DPDE4PM = function(
   GTF,
   RESOLUTION = 50,
   DP.ITERATIONS = 1000,
-  OUTPUTDIR ="."
+  OUTPUTDIR =".",
+  PLOT.RESULT=F
 ){
 
   # Making a list of parameters to pass back and forth
   PARAMETERS = list()
   PARAMETERS$GENE = GENE
-  # PARAMETERS$PEAKS = PEAKS
   PARAMETERS$GTF = GTF
   PARAMETERS$RESOLUTION = RESOLUTION
   PARAMETERS$DP.ITERATIONS = DP.ITERATIONS
   PARAMETERS$OUTPUTDIR = OUTPUTDIR
+  PARAMETERS$PLOT.RESULT = PLOT.RESULT
+
+  # Error messages
+  # 1. Check if OUTPUTDIR exists
+  # 2. Check if peaks are in the right format
+  # 3. Check if gene is in peaks & gtf
 
   # Import GTF as a GRanges Object
   ANNOTATION = .read.gtf(PARAMETERS)
@@ -41,7 +47,6 @@ DPDE4PM = function(
 
   # Split into peaks
   GENEPEAKSGR = PEAKSGR[PEAKSGR$name == PARAMETERS$GENE]
-  # GENEPEAKSGR = GENEPEAKSGR[GENEPEAKSGR$sample == "CPCG0100"]
 
   # Converting to RNA
   GENEPEAKSGR = shift(GENEPEAKSGR, -1*GENEINFO$left+1)
@@ -53,7 +58,7 @@ DPDE4PM = function(
   GENEPEAKSGR = unlist(reduce(GENEPEAKSGR))
 
   # Creating some big peaks
-  # REDUCED.GENE.PEAKS.GR = reduce(GENEPEAKSGR)
+  REDUCED.GENE.PEAKS.GR = reduce(GENEPEAKSGR)
 
   # Initializing Data
   plot.startvec = data.frame(stringsAsFactors = F)
@@ -61,15 +66,15 @@ DPDE4PM = function(
   plot.bin.counts = data.frame(stringsAsFactors = F)
   plot.dp = data.frame(stringsAsFactors = F) # dp parameters
 
-  # for(i in 1:length(REDUCED.GENE.PEAKS.GR)){
+  for(i in 1:length(REDUCED.GENE.PEAKS.GR)){
 
     # Generating Data
-    # OVERLAP.PEAKS.GR = GENEPEAKSGR[queryHits(findOverlaps(GENEPEAKSGR, REDUCED.GENE.PEAKS.GR[i]))]
-    # TILED.PEAKS.GR = tile(OVERLAP.PEAKS.GR, width = PARAMETERS$RESOLUTION)
-    # startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
-
-    TILED.PEAKS.GR = tile(GENEPEAKSGR, width = PARAMETERS$RESOLUTION)
+    OVERLAP.PEAKS.GR = GENEPEAKSGR[queryHits(findOverlaps(GENEPEAKSGR, REDUCED.GENE.PEAKS.GR[i]))]
+    TILED.PEAKS.GR = tile(OVERLAP.PEAKS.GR, width = PARAMETERS$RESOLUTION)
     startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
+
+    # TILED.PEAKS.GR = tile(GENEPEAKSGR, width = PARAMETERS$RESOLUTION)
+    # startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
 
     # Dirichlet Process
     startvec.mean = mean(as.vector(startvec$start))
@@ -79,12 +84,12 @@ DPDE4PM = function(
     dp = Fit(dp, PARAMETERS$DP.ITERATIONS) # progressBar = FALSE)
 
     # Peak Coverage
-    # PEAK.COVERAGE = coverage(OVERLAP.PEAKS.GR)
-    # BINS = tile(REDUCED.GENE.PEAKS.GR[i], width = 1)[[1]]
-    # BIN.COUNTS = data.frame(GenomicRanges::binnedAverage(BINS, PEAK.COVERAGE, "Coverage"), stringsAsFactors = F)
-    PEAK.COVERAGE = coverage(GENEPEAKSGR)
-    BINS = unlist(tile(REDUCED.GENE.PEAKS.GR, width = 1))
+    PEAK.COVERAGE = coverage(OVERLAP.PEAKS.GR)
+    BINS = tile(REDUCED.GENE.PEAKS.GR[i], width = 1)[[1]]
     BIN.COUNTS = data.frame(GenomicRanges::binnedAverage(BINS, PEAK.COVERAGE, "Coverage"), stringsAsFactors = F)
+    # PEAK.COVERAGE = coverage(GENEPEAKSGR)
+    # BINS = unlist(tile(REDUCED.GENE.PEAKS.GR, width = 1))
+    # BIN.COUNTS = data.frame(GenomicRanges::binnedAverage(BINS, PEAK.COVERAGE, "Coverage"), stringsAsFactors = F)
 
     # Plotting Data
     x.norm <- seq(min(startvec.scaled)-1, max(startvec.scaled)+1, by=0.01)
@@ -98,30 +103,12 @@ DPDE4PM = function(
     plot.fit.frame = rbind(plot.fit.frame, fit.frame)
     plot.bin.counts = rbind(plot.bin.counts, BIN.COUNTS)
     # plot.dp
-  # }
+  }
 
+  if(PARAMETERS$PLOT.RESULT){
+    .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.dp, PARAMETERS$OUTPUTDIR)
+  }
 
-  filename = "~/figures/testing.DP.pdf"
-  pdf(filename)
-
-  ggplot() +
-    geom_histogram(data=plot.startvec, aes(x=start), binwidth = 50, colour = "black", fill="white") +
-    geom_line(data=plot.fit.frame, aes(x=x,y=y), colour='red') +
-    theme_bw() +
-    ggtitle(PARAMETERS$GENE)
-
-  ggplot() +
-    geom_line(data=plot.bin.counts, aes(x=start,y=Coverage), colour='blue') +
-    geom_line(data=plot.fit.frame, aes(x=x,y=y), colour='red') +
-    theme_bw() +
-    ggtitle(PARAMETERS$GENE)
-
-  dev.off()
-
-
-  # Dirichlet Density Estimation
-
-  # Plotting
 
   # Saving Result
 
