@@ -1,10 +1,17 @@
+#' Title
+#'
+#' @param PARAMETERS
+#'
+#' @return
+#'
+#' @examples
 .read.gtf <- function(PARAMETERS){
-  
+
   # Creating a TXDB
   op <- options(warn = (-1))
   txdb=makeTxDbFromGFF(PARAMETERS$GTF,format="gtf")
   options(op)
-  
+
   # Filtering the TXDB
   colkey <- columns(txdb)
   select_col <- match(c("EXONCHROM","TXID","EXONSTART","EXONEND","EXONSTRAND","GENEID","TXNAME"),colkey)
@@ -17,7 +24,7 @@
   options(op)
   temp$"feature" <- "exon";
   gtf <- temp
-  
+
   # return data
   return(gtf)
 }

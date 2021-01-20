@@ -1,9 +1,20 @@
 Package: DPDE4PM
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Title: A Method for Peak Merging Across Biological Replicates
+Version: 1.0.0
+Authors@R: person("Helen", "Zhu", email = "helen.zhu@mail.utoronto.ca", role = c("aut", "cre"))
+Description: A method for merging peaks called across biological replicates, in bed file format, identified across the transcriptome using variational Bayes on a Dirichlet prior to estimate a GMM model.
 Depends: R (>= 3.4.1)
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Suggests:
+	GenomicRanges,
+  GenomicFeatures,
+  dirichletprocess,
+  ggplot2,
+  Sushi,
+	testthat,
+  metap,
+	rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 7.1.1
