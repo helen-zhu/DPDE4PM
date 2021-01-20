@@ -10,7 +10,8 @@ DPDE4PM(
   GTF,
   RESOLUTION = 50,
   DP.ITERATIONS = 1000,
-  OUTPUTDIR = "."
+  OUTPUTDIR = ".",
+  PLOT.RESULT = F
 )
 }
 \arguments{

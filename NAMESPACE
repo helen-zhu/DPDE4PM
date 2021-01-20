@@ -2,4 +2,7 @@
 
 S3method(merge,p)
 S3method(plot,gene.peaks)
+export(.get.gene.anno)
+export(.plot.merged.peaks)
+export(.read.gtf)
 export(DPDE4PM)
