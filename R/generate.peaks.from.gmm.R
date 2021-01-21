@@ -28,6 +28,7 @@
     "chr" = GENEINFO$chr,
     "start" = round(dp_data$Mu - PARAMETERS$N.SD*dp_data$Sigma),
     "end" = round(dp_data$Mu + PARAMETERS$N.SD*dp_data$Sigma),
+    "name" = GENEINFO$gene,
     "strand" = GENEINFO$strand,
     "weights" = dp_data$Weights,
     "i" = dp_data$i,

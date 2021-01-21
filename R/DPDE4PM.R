@@ -136,9 +136,12 @@ DPDE4PM = function(
   }
 
   # Merging P-Values
-  # Find overlapping peaks with each peak and use Fisher's Method
+  SAMPLE.PVAL = .merge.p(PEAKS, MERGED_PEAKS, ANNOTATION, PARAMETERS)
 
   # Return a Data Frame of Merged Peaks
-  PEAKS.FINAL = .bed12tobed6(merged.peaks.genome)
+  start(merged.peaks.genome) = start(merged.peaks.genome)-1
+  merged.peaks.genome.df = data.frame(merged.peaks.genome, stringsAsFactors = F)
+  PEAKS.FINAL = .bed12tobed6(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))
 
+  # Write Output Tables & Return Files
 }
