@@ -1,4 +1,14 @@
 
+#' Title
+#'
+#' @param dp_data 
+#' @param PARAMETERS 
+#' @param GENEINFO 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 .generate.peaks.from.gmm = function(
   dp_data,
   PARAMETERS,
@@ -45,10 +55,10 @@
   
   # Filtering Out Introns
   merged.peaks.filtered.genome = do.call(c, lapply(1:length(merged.peaks.genome), function(i){
-      tmp = intersect(merged.peaks.filtered.genome[i], anno_gr)
-      if(length(tmp) > 0){mcols(tmp) = mcols(merged.peaks.filtered.genome[i])}
+      tmp = intersect(merged.peaks.genome[i], anno_gr)
+      if(length(tmp) > 0){mcols(tmp) = mcols(merged.peaks.genome[i])}
       tmp
   }))
 
-  return(list(merged.peaks.filtered, merged.peaks.filtered.genome))
+  return(list(merged.peaks.filtered.rna, merged.peaks.filtered.genome))
 }
