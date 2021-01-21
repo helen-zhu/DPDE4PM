@@ -30,7 +30,9 @@
     geom_line(data=plot.fit.frame, aes(x=x,y=y), colour='red') +
     theme_bw() +
     ggtitle(PARAMETERS$GENE) +
-    annotate("rect", xmin=merged.peaks.df$start, xmax=merged.peaks.df$end, ymin=-1 , ymax=-0.1, alpha=0.2, color="black", fill=rainbow(nrow(merged.peaks.df)))
+    ylab("Binned Counts From Peaks (Used to Fit GMM)") +
+    xlab("Transcript Coordinate") +
+    annotate("rect", xmin=merged.peaks.df$start, xmax=merged.peaks.df$end, ymin=-1 , ymax=-0.1, alpha=0.5, color="black", fill=rainbow(nrow(merged.peaks.df)))
   print(p1)
   
   p2 = ggplot() +
@@ -38,7 +40,9 @@
     geom_line(data=plot.fit.frame, aes(x=x,y=y), colour='red') +
     theme_bw() +
     ggtitle(PARAMETERS$GENE) +
-    annotate("rect", xmin=merged.peaks.df$start, xmax=merged.peaks.df$end, ymin=-1 , ymax=0.1, alpha=0.2, color="black", fill=rainbow(nrow(merged.peaks.df)))
+    ylab("Coverage (at BP resolution)") +
+    xlab("Transcript Coordinate") +
+    annotate("rect", xmin=merged.peaks.df$start, xmax=merged.peaks.df$end, ymin=-1 , ymax=-0.1, alpha=0.5, color="black", fill=rainbow(nrow(merged.peaks.df)))
   print(p2)
   
   dev.off()

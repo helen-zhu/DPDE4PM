@@ -139,5 +139,6 @@ DPDE4PM = function(
   # Find overlapping peaks with each peak and use Fisher's Method
 
   # Return a Data Frame of Merged Peaks
+  PEAKS.FINAL = .bed12tobed6(merged.peaks.genome)
 
 }
