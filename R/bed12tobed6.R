@@ -10,7 +10,8 @@
 #' @examples
 .bed6tobed12 = function(
   MERGED.PEAKS,
-  ID.COLS ){
+  ID.COLS 
+){
   
   MERGED.PEAKS$tag = apply(MERGED.PEAKS[,ID.COLS], 1, function(x) paste(x, collapse = ":"))
   
