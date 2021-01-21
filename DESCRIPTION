@@ -12,6 +12,7 @@ Suggests:
   GenomicFeatures,
   dirichletprocess,
   ggplot2,
+  reshape2,
   Sushi,
 	testthat,
   metap,

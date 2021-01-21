@@ -4,10 +4,10 @@
 \alias{merge.p}
 \title{Title}
 \usage{
-\method{merge}{p}(PEAKS, MERGED_PEAKS, ANNOTATION, PARAMETERS)
+\method{merge}{p}(PEAKSGR, MERGED.PEAKS, ANNOTATION, PARAMETERS, ID.COLS)
 }
 \arguments{
-\item{PARAMETERS}{}
+\item{ID.COLS}{}
 }
 \value{
 

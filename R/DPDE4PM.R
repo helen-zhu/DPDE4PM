@@ -135,13 +135,18 @@ DPDE4PM = function(
     .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.dp, plot.merged.peaks, PARAMETERS)
   }
 
-  # Merging P-Values
-  SAMPLE.PVAL = .merge.p(PEAKS, MERGED_PEAKS, ANNOTATION, PARAMETERS)
+
 
   # Return a Data Frame of Merged Peaks
   start(merged.peaks.genome) = start(merged.peaks.genome)-1
   merged.peaks.genome.df = data.frame(merged.peaks.genome, stringsAsFactors = F)
   PEAKS.FINAL = .bed12tobed6(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))
+
+  # Merging P-Values
+  # Remember to pass through a bed formatted MERGED PEAKS
+  # Make sure it's the same gene
+  # Make it's the same p-value
+  SAMPLE.PVAL = .merge.p(PEAKSGR, MERGED.PEAKS = merged.peaks.genome, ANNOTATION, PARAMETERS, ID.COLS = c("name", "i", "j"))
 
   # Write Output Tables & Return Files
 }
