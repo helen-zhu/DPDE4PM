@@ -29,9 +29,12 @@
   exome_length=sum(DNA2RNA) # this is actally exome length
   DNA2RNA=cumsum(DNA2RNA)*DNA2RNA
 
+  # prepare RNA2DNA
+  RNA2DNA = left:right
+  RNA2DNA = RNA2DNA[DNA2RNA > 0]
 
   # summarize result
-  batch_anno=list(gene=gene,chr=chr,strand=strand,left=left,right=right,
-                  DNA2RNA=DNA2RNA,dna_length=dna_length,
+  batch_anno=list(anno=anno_unique, gene=gene,chr=chr,strand=strand,left=left,right=right,
+                  DNA2RNA=DNA2RNA, RNA2DNA=RNA2DNA, dna_length=dna_length,
                   exome_length=exome_length)
 }
