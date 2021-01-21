@@ -2,6 +2,8 @@
 
 S3method(merge,p)
 S3method(plot,gene.peaks)
+export(.bed6tobed12)
+export(.generate.peaks.from.gmm)
 export(.get.gene.anno)
 export(.plot.merged.peaks)
 export(.read.gtf)
