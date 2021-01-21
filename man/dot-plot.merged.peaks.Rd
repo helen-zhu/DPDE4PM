@@ -9,6 +9,7 @@
   plot.fit.frame,
   plot.bin.counts,
   plot.dp,
+  plot.merged.peaks,
   PARAMETERS
 )
 }

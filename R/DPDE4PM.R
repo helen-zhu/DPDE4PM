@@ -42,9 +42,8 @@ DPDE4PM = function(
   # Import GTF as a GRanges Object
   ANNOTATION = .read.gtf(PARAMETERS)
 
-  # Get DNA2RNA
+  # Get Gene Information
   GENEINFO = .get.gene.anno(PARAMETERS, ANNOTATION)
-  GENE.EXON.GR = GRanges(seqnames = GENEINFO$chr, IRanges(0, GENEINFO$exome_length), strand = GENEINFO$strand)
 
   # Turning PEAKS into a GRanges Object
   PEAKSGR = makeGRangesFromDataFrame(PEAKS, keep.extra.columns = T)
