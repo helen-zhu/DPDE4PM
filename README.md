@@ -3,7 +3,7 @@ Dirichlet process density estimation for peak merging (DPDE4PM) is a tool that m
 
 
 ## How It Works
-![alt text](https://github.com/helen-zhu/DPDE4PM/blob/master/DPDE4PM.png?raw=true)
+![alt text](https://github.com/helen-zhu/DPDE4PM/blob/main/DPDE4PM.png?raw=true)
 
 ## Installation
 
