@@ -1,8 +1,8 @@
 
 #' Title
 #'
-#' @param PEAKS 
-#' @param ID.COL 
+#' @param PEAKS
+#' @param ID.COL
 #'
 #' @return
 #' @export
@@ -10,11 +10,11 @@
 #' @examples
 .bed6tobed12 = function(
   MERGED.PEAKS,
-  ID.COLS 
+  ID.COLS
 ){
-  
+
   MERGED.PEAKS$tag = apply(MERGED.PEAKS[,ID.COLS], 1, function(x) paste(x, collapse = ":"))
-  
+
   BED12 = do.call(rbind, lapply(unique(MERGED.PEAKS$tag), function(itag) {
     TMP.PEAK = MERGED.PEAKS[MERGED.PEAKS$tag == itag,]
     TMP.PEAK = TMP.PEAK[order(TMP.PEAK$start),]
@@ -31,9 +31,10 @@
       "blockCount" = nrow(TMP.PEAK),
       "blockSizes" = paste0(paste(TMP.PEAK$end - TMP.PEAK$start, collapse = ","), ","),
       "blockStarts" = paste0(paste(TMP.PEAK$start - min(TMP.PEAK$start), collapse = ","), ","),
+      "peak" = itag,
       stringsAsFactors = F
       )
-    
+
   }))
   return(BED12)
 }

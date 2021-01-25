@@ -20,7 +20,7 @@
   if(nrow(dp_data) == 0){
     warning("No Peaks Survive Past The Threshold. Consider Lowering Requirements or Tuning Parameters.",
             call. = TRUE, domain = NULL)
-    return(list(data.frame(), data.frame()))
+    return(list(GRanges(),  GRanges())))
   }
   dp_data = dp_data[order(-dp_data$Weights),]
   

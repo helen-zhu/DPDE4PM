@@ -20,7 +20,8 @@ DPDE4PM = function(
   WEIGHT.THRESHOLD = 0.2,
   N.SD = 1,
   OUTPUTDIR =".",
-  PLOT.RESULT=F
+  PLOT.RESULT=F,
+  WRITE.OUTPUT=T
 ){
 
   # Making a list of parameters to pass back and forth
@@ -33,6 +34,7 @@ DPDE4PM = function(
   PARAMETERS$N.SD = N.SD
   PARAMETERS$OUTPUTDIR = OUTPUTDIR
   PARAMETERS$PLOT.RESULT = PLOT.RESULT
+  PARAMETERS$WRITE.OUTPUT = WRITE.OUTPUT
 
   # Error messages
   # 1. Check if OUTPUTDIR exists
@@ -46,10 +48,10 @@ DPDE4PM = function(
   GENEINFO = .get.gene.anno(PARAMETERS, ANNOTATION)
 
   # Turning PEAKS into a GRanges Object
-  GENEPEAKSGR = .retrieve.peaks.as.granges(PEAKS, GENEINFO)
+  PEAKSGR = .retrieve.peaks.as.granges(PEAKS, GENEINFO)
 
   # Converting to RNA
-  GENEPEAKSGR = shift(GENEPEAKSGR, -1*GENEINFO$left+1)
+  GENEPEAKSGR = shift(PEAKSGR, -1*GENEINFO$left+1)
   start(GENEPEAKSGR) = GENEINFO$DNA2RNA[start(GENEPEAKSGR)+1]
   end(GENEPEAKSGR) = GENEINFO$DNA2RNA[end(GENEPEAKSGR)]
 
@@ -132,18 +134,31 @@ DPDE4PM = function(
     .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.dp, plot.merged.peaks, PARAMETERS)
   }
 
-
-
   # Return a Data Frame of Merged Peaks
   start(merged.peaks.genome) = start(merged.peaks.genome)-1
   merged.peaks.genome.df = data.frame(merged.peaks.genome, stringsAsFactors = F)
-  PEAKS.FINAL = .bed12tobed6(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))
+  colnames(merged.peaks.genome.df) = c("chr", "start", "end", "width", "strand", "name", "weights", "i", "j")
+  PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))
 
   # Merging P-Values
-  # Remember to pass through a bed formatted MERGED PEAKS
-  # Make sure it's the same gene
-  # Make it's the same p-value
   SAMPLE.PVAL = .merge.p(PEAKSGR, MERGED.PEAKS = merged.peaks.genome, ANNOTATION, PARAMETERS, ID.COLS = c("name", "i", "j"))
 
   # Write Output Tables & Return Files
+  OUTPUT.TABLE = merge(PEAKS.FINAL, SAMPLE.PVAL, by = "peak", all = T)
+  OUTPUT.TABLE = OUTPUT.TABLE[,colnames(OUTPUT.TABLE) != "peak"]
+
+  if(PARAMETERS$WRITE.OUTPUT){
+    filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".MergedPeaks.tsv")
+    write.table(
+      OUTPUT.TABLE,
+      file = filename,
+      sep = "\t",
+      col.names = T,
+      row.names = F,
+      quote = F
+    )
+  }
+
+  return(OUTPUT.TABLE)
+
 }

@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-merge.p = function(PEAKSGR, MERGED.PEAKS, ANNOTATION, PARAMETERS, ID.COLS){
+.merge.p = function(PEAKSGR, MERGED.PEAKS, ANNOTATION, PARAMETERS, ID.COLS){
 
   # Numeric Stability
   PEAKSGR$score = ifelse(PEAKSGR$score == 0, 2e-16, PEAKSGR$score)
@@ -22,15 +22,16 @@ merge.p = function(PEAKSGR, MERGED.PEAKS, ANNOTATION, PARAMETERS, ID.COLS){
   # Finding Overlaps
   overlaps = findOverlaps(MERGED.PEAKS, PEAKSGR)
   overlapping_peaks = PEAKSGR[subjectHits(overlaps)]
-  overlapping_peaks$peak = MERGED.PEAKS$tag[queryHits(overlaps)]
-  overlapping_peaks$tag = paste0(overlapping_peaks$sample, ":", MERGED.PEAKS$tag[queryHits(overlaps)])
+  overlapping_peaks$merged_peak = MERGED.PEAKS$tag[queryHits(overlaps)]
+  overlapping_peaks$tag = paste0(overlapping_peaks$sample, ":", overlapping_peaks$merged_peak)
 
   overlapping_peaks = split(overlapping_peaks, overlapping_peaks$tag)
   results = do.call(rbind, lapply(1:length(overlapping_peaks), function(i){
     tmp = overlapping_peaks[[i]]
-    p = ifelse(length(tmp) > 1, metap::sumlog(tmp$score)$p, tmp$score)
+    unique_p = unique(mcols(tmp)[c("peak", "score")])
+    p = ifelse(nrow(unique_p) > 1, metap::sumlog(unique_p$score)$p, unique_p$score)
     data.frame(
-      "peak" = tmp$peak[1],
+      "peak" = tmp$merged_peak[1],
       "sample" = tmp$sample[1],
       "p" = p,
       stringsAsFactors = F
