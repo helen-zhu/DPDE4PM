@@ -42,7 +42,7 @@
     if(i == 1){
       tmp = merged.peaks.gr[1]
     }else{
-      tmp = setdiff(merged.peaks.gr[i], merged.peaks.gr[1:(i-1)])
+      tmp = setdiff(merged.peaks.gr[i], merged.peaks.gr[c(1:(i-1))])
       if(length(tmp) > 0){mcols(tmp) = mcols(merged.peaks.gr[i])}
     }
     tmp
