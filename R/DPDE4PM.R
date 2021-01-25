@@ -46,10 +46,7 @@ DPDE4PM = function(
   GENEINFO = .get.gene.anno(PARAMETERS, ANNOTATION)
 
   # Turning PEAKS into a GRanges Object
-  PEAKSGR = makeGRangesFromDataFrame(PEAKS, keep.extra.columns = T)
-
-  # Split into peaks
-  GENEPEAKSGR = PEAKSGR[PEAKSGR$name == PARAMETERS$GENE]
+  GENEPEAKSGR = .retrieve.peaks.as.granges(PEAKS, GENEINFO)
 
   # Converting to RNA
   GENEPEAKSGR = shift(GENEPEAKSGR, -1*GENEINFO$left+1)
