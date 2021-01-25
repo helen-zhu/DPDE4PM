@@ -43,7 +43,7 @@
     if(i == 1){
       tmp = merged.peaks.gr[1]
     }else{
-      tmp = setdiff(merged.peaks.gr[i], merged.peaks.gr[c(1:(i-1))])
+      tmp = GenomicRanges::setdiff(merged.peaks.gr[i], merged.peaks.gr[1:(i-1)])
       if(length(tmp) > 0){mcols(tmp) = mcols(merged.peaks.gr[i])}
     }
     tmp
@@ -57,7 +57,7 @@
   
   # Filtering Out Introns
   merged.peaks.filtered.genome = do.call(c, lapply(1:length(merged.peaks.genome), function(i){
-      tmp = intersect(merged.peaks.genome[c(i)], anno_gr)
+      tmp = GenomicRanges::intersect(merged.peaks.genome[i], anno_gr)
       if(length(tmp) > 0){mcols(tmp) = mcols(merged.peaks.genome[i])}
       tmp
   }))
