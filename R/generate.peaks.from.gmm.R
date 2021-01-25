@@ -20,6 +20,7 @@
   if(nrow(dp_data) == 0){
     warning("No Peaks Survive Past The Threshold. Consider Lowering Requirements or Tuning Parameters.",
             call. = TRUE, domain = NULL)
+    return(list(data.frame(), data.frame()))
   }
   dp_data = dp_data[order(-dp_data$Weights),]
   
@@ -56,7 +57,7 @@
   
   # Filtering Out Introns
   merged.peaks.filtered.genome = do.call(c, lapply(1:length(merged.peaks.genome), function(i){
-      tmp = intersect(merged.peaks.genome[i], anno_gr)
+      tmp = intersect(merged.peaks.genome[c(i)], anno_gr)
       if(length(tmp) > 0){mcols(tmp) = mcols(merged.peaks.genome[i])}
       tmp
   }))
