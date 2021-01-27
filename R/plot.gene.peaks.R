@@ -17,6 +17,7 @@
 #' }
 #' @param GTF The GTF file used to generate the peaks. This is used to determine the genomic coordinates of the gene.
 #' @param OUTPUTDIR Output directory
+#' @param OUTPUT.TAG A character string indicating a tag to track the generated files
 #'
 #' @export
 #'
@@ -25,7 +26,8 @@ plot.gene.peaks = function(
   GENE,
   PEAKS,
   GTF,
-  OUTPUTDIR = "."
+  OUTPUTDIR = ".",
+  OUTPUT.TAG = ""
 ){
 
   # Making a list of parameters to pass back and forth
@@ -34,6 +36,7 @@ plot.gene.peaks = function(
   # PARAMETERS$PEAKS = PEAKS
   PARAMETERS$GTF = GTF
   PARAMETERS$OUTPUTDIR = OUTPUTDIR
+  PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
 
   # Import GTF as a GRanges Object
   ANNOTATION = .read.gtf(PARAMETERS)
@@ -53,7 +56,7 @@ plot.gene.peaks = function(
   peak.bed$col = sample_colour[peak.bed$sample]
 
   # Plotting
-  filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, "_Peaks.pdf")
+  filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".Peaks.pdf")
   pdf(filename)
 
   layout(matrix(c(1,2),2, 1, byrow = TRUE), heights = c(0.9,0.1))

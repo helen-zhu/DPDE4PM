@@ -22,6 +22,7 @@
 #' @param N.SD Number of standard deviations from the mean for each fitted Gaussian that should considered part of the joint peak
 #' @param PLOT.RESULT TRUE or FALSE, whether plots should be generated
 #' @param WRITE.OUTPUT TRUE or FALSE, whether an output file should be saved
+#' @param OUTPUT.TAG A character string indicating a tag to track the generated files
 #'
 #' @return A dataframe with BED12 columns and additional columns for each sample in the PEAKS dataframe and associated p-value with that peak.
 #'
@@ -44,7 +45,8 @@ DPDE4PM = function(
   N.SD = 1,
   OUTPUTDIR =".",
   PLOT.RESULT=F,
-  WRITE.OUTPUT=T
+  WRITE.OUTPUT=T,
+  OUTPUT.TAG=""
 ){
 
   # Making a list of parameters to pass back and forth
@@ -58,6 +60,7 @@ DPDE4PM = function(
   PARAMETERS$OUTPUTDIR = OUTPUTDIR
   PARAMETERS$PLOT.RESULT = PLOT.RESULT
   PARAMETERS$WRITE.OUTPUT = WRITE.OUTPUT
+  PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
 
   # Error messages
   # 1. Check if OUTPUTDIR exists
@@ -171,7 +174,7 @@ DPDE4PM = function(
   OUTPUT.TABLE = OUTPUT.TABLE[,colnames(OUTPUT.TABLE) != "peak"]
 
   if(PARAMETERS$WRITE.OUTPUT){
-    filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".MergedPeaks.tsv")
+    filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".MergedPeaks.tsv")
     write.table(
       OUTPUT.TABLE,
       file = filename,

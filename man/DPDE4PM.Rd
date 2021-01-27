@@ -14,7 +14,8 @@ DPDE4PM(
   N.SD = 1,
   OUTPUTDIR = ".",
   PLOT.RESULT = F,
-  WRITE.OUTPUT = T
+  WRITE.OUTPUT = T,
+  OUTPUT.TAG = ""
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ DPDE4PM(
 \item{PLOT.RESULT}{TRUE or FALSE, whether plots should be generated}
 
 \item{WRITE.OUTPUT}{TRUE or FALSE, whether an output file should be saved}
+
+\item{OUTPUT.TAG}{A character string indicating a tag to track the generated files}
 }
 \value{
 A dataframe with BED12 columns and additional columns for each sample in the PEAKS dataframe and associated p-value with that peak.

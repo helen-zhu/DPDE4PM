@@ -16,7 +16,7 @@
 
   merged.peaks.df = data.frame(plot.merged.peaks, stringsAsFactors = F)
 
-  filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".MergedPeaks.pdf")
+  filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".MergedPeaks.pdf")
   pdf(filename)
 
   p1 = ggplot() +
