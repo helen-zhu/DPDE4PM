@@ -15,7 +15,8 @@ DPDE4PM(
   OUTPUTDIR = ".",
   PLOT.RESULT = F,
   WRITE.OUTPUT = T,
-  OUTPUT.TAG = ""
+  OUTPUT.TAG = "",
+  ALPHA.PRIORS = c(2, 4)
 )
 }
 \arguments{
@@ -52,6 +53,8 @@ DPDE4PM(
 \item{WRITE.OUTPUT}{TRUE or FALSE, whether an output file should be saved}
 
 \item{OUTPUT.TAG}{A character string indicating a tag to track the generated files}
+
+\item{ALPHA.PRIORS}{A length 2 numeric vector indicating alpha, beta of the Gamma distribution from which the concentration weight parameter alpha is drawn, see the R package dirichletprocess}
 }
 \value{
 A dataframe with BED12 columns and additional columns for each sample in the PEAKS dataframe and associated p-value with that peak.
