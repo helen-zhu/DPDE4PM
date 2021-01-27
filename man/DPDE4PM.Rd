@@ -16,7 +16,7 @@ DPDE4PM(
   PLOT.RESULT = F,
   WRITE.OUTPUT = T,
   OUTPUT.TAG = "",
-  ALPHA.PRIORS = c(2, 4)
+  ALPHA.PRIORS = c(1, 2)
 )
 }
 \arguments{

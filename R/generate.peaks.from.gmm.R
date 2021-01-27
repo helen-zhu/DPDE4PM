@@ -45,7 +45,7 @@
       tmp = merged.peaks.gr[1]
     }else{
       tmp = GenomicRanges::setdiff(merged.peaks.gr[i], merged.peaks.gr[1:(i-1)])
-      if(length(tmp) > 0){GenomicRanges::mcols(tmp) = mcols(merged.peaks.gr[i])}
+      if(length(tmp) > 0){S4Vectors::mcols(tmp) = S4Vectors::mcols(merged.peaks.gr[i])}
     }
     tmp
   }))
@@ -59,7 +59,7 @@
   # Filtering Out Introns
   merged.peaks.filtered.genome = do.call(c, lapply(1:length(merged.peaks.genome), function(i){
       tmp = GenomicRanges::intersect(merged.peaks.genome[i], anno_gr)
-      if(length(tmp) > 0){GenomicRanges::mcols(tmp) = GenomicRanges::mcols(merged.peaks.genome[i])}
+      if(length(tmp) > 0){S4Vectors::mcols(tmp) = S4Vectors::mcols(merged.peaks.genome[i])}
       tmp
   }))
 

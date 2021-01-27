@@ -26,5 +26,5 @@
     BED6 = rbind(BED6, tmp)
   }
 
-  makeGRangesFromDataFrame(BED6, keep.extra.columns = T)
+  GenomicRanges::makeGRangesFromDataFrame(BED6, keep.extra.columns = T)
 }

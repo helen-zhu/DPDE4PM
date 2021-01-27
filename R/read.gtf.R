@@ -17,15 +17,15 @@
 
   # Creating a TXDB
   op <- options(warn = (-1))
-  txdb=makeTxDbFromGFF(PARAMETERS$GTF,format="gtf")
+  txdb=GenomicFeatures::makeTxDbFromGFF(PARAMETERS$GTF,format="gtf")
   options(op)
 
   # Filtering the TXDB
-  colkey <- columns(txdb)
+  colkey <- AnnotationDbi::columns(txdb)
   select_col <- match(c("EXONCHROM","TXID","EXONSTART","EXONEND","EXONSTRAND","GENEID","TXNAME"),colkey)
   op <- options(warn = (-1))
-  ID = keys(txdb, "TXID")
-  temp = select(txdb, ID , c(columns(txdb))[select_col], "TXID")
+  ID = AnnotationDbi::keys(txdb, "TXID")
+  temp = AnnotationDbi::select(txdb, ID , c(AnnotationDbi::columns(txdb))[select_col], "TXID")
   select_col2 <- match(c("EXONCHROM","TXID","EXONSTART","EXONEND","EXONSTRAND","GENEID","TXNAME"),names(temp))
   temp <- temp[,select_col2]
   colnames(temp)=c("chr","feature","start","stop","strand","gene","transcript")

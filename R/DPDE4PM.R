@@ -31,7 +31,6 @@
 #' @importFrom graphics layout mtext par
 #' @importFrom stats end sd start
 #' @importFrom utils write.table
-#' @importFrom ggplot2 ggplot aes geom_histogram geom_line
 #'
 #' @export
 #'
@@ -48,7 +47,7 @@ DPDE4PM = function(
   PLOT.RESULT=F,
   WRITE.OUTPUT=T,
   OUTPUT.TAG="",
-  ALPHA.PRIORS = c(2,4)
+  ALPHA.PRIORS = c(1,2)
 ){
 
   # Making a list of parameters to pass back and forth
@@ -80,30 +79,30 @@ DPDE4PM = function(
   PEAKSGR = .retrieve.peaks.as.granges(PEAKS, GENEINFO)
 
   # Converting to RNA
-  GENEPEAKSGR = shift(PEAKSGR, -1*GENEINFO$left+1)
-  start(GENEPEAKSGR) = GENEINFO$DNA2RNA[start(GENEPEAKSGR)+1]
-  end(GENEPEAKSGR) = GENEINFO$DNA2RNA[end(GENEPEAKSGR)]
+  GENEPEAKSGR = GenomicRanges::shift(PEAKSGR, -1*GENEINFO$left+1)
+  GenomicRanges::start(GENEPEAKSGR) = GENEINFO$DNA2RNA[GenomicRanges::start(GENEPEAKSGR)+1]
+  GenomicRanges::end(GENEPEAKSGR) = GENEINFO$DNA2RNA[GenomicRanges::end(GENEPEAKSGR)]
 
   # Reduce Overlapping Peaks in the Same Sample
   GENEPEAKSGR = split(GENEPEAKSGR, GENEPEAKSGR$sample)
-  GENEPEAKSGR = unlist(reduce(GENEPEAKSGR))
+  GENEPEAKSGR = unlist(GenomicRanges::reduce(GENEPEAKSGR))
 
   # Creating some big peaks
-  REDUCED.GENE.PEAKS.GR = reduce(GENEPEAKSGR)
+  REDUCED.GENE.PEAKS.GR = GenomicRanges::reduce(GENEPEAKSGR)
 
   # Initializing Data
   plot.startvec = data.frame(stringsAsFactors = F)
   plot.fit.frame = data.frame(stringsAsFactors = F)
   plot.bin.counts = data.frame(stringsAsFactors = F)
   plot.dp = data.frame(stringsAsFactors = F)
-  plot.merged.peaks = GRanges()
-  merged.peaks.genome = GRanges()
+  plot.merged.peaks = GenomicRanges::GRanges()
+  merged.peaks.genome = GenomicRanges::GRanges()
 
   for(i in 1:length(REDUCED.GENE.PEAKS.GR)){
 
     # Generating Data
-    OVERLAP.PEAKS.GR = GENEPEAKSGR[queryHits(findOverlaps(GENEPEAKSGR, REDUCED.GENE.PEAKS.GR[i]))]
-    TILED.PEAKS.GR = tile(OVERLAP.PEAKS.GR, width = PARAMETERS$RESOLUTION)
+    OVERLAP.PEAKS.GR = GENEPEAKSGR[S4Vectors::queryHits(GenomicRanges::findOverlaps(GENEPEAKSGR, REDUCED.GENE.PEAKS.GR[i]))]
+    TILED.PEAKS.GR = GenomicRanges::tile(OVERLAP.PEAKS.GR, width = PARAMETERS$RESOLUTION)
     startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
 
     # Dirichlet Process
@@ -111,12 +110,12 @@ DPDE4PM = function(
     startvec.sd = sd(as.vector(startvec$start))
     startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
 
-    dp = DirichletProcessGaussian(
+    dp = dirichletprocess::DirichletProcessGaussian(
       y = startvec.scaled,
       g0Priors = c(0, 1, 1, 1),
       alphaPriors = PARAMETERS$ALPHA.PRIORS)
 
-    dp = Fit(dpObj = dp,
+    dp = dirichletprocess::Fit(dpObj = dp,
              its = PARAMETERS$DP.ITERATIONS,
              updatePrior = F,
              progressBar = TRUE)
@@ -138,13 +137,13 @@ DPDE4PM = function(
     merged.peaks.gen = merged.peaks[[2]]
 
     # Peak Coverage
-    PEAK.COVERAGE = coverage(OVERLAP.PEAKS.GR)
-    BINS = tile(REDUCED.GENE.PEAKS.GR[i], width = 1)[[1]]
+    PEAK.COVERAGE = GenomicRanges::coverage(OVERLAP.PEAKS.GR)
+    BINS = GenomicRanges::tile(REDUCED.GENE.PEAKS.GR[i], width = 1)[[1]]
     BIN.COUNTS = data.frame(GenomicRanges::binnedAverage(BINS, PEAK.COVERAGE, "Coverage"), stringsAsFactors = F)
 
     # Plotting Data
     x.norm <- seq(min(startvec.scaled), max(startvec.scaled), by=0.01)
-    y.fit <- data.frame(replicate(100, PosteriorFunction(dp)(x.norm)))
+    y.fit <- data.frame(replicate(100, dirichletprocess::PosteriorFunction(dp)(x.norm)))
     fit.frame <- data.frame(x=x.norm, y=rowMeans(y.fit))
     fit.frame$x = (fit.frame$x*startvec.sd)+startvec.mean
     fit.frame$y = fit.frame$y*max(BIN.COUNTS$Coverage)
@@ -164,7 +163,7 @@ DPDE4PM = function(
   }
 
   # Return a Data Frame of Merged Peaks
-  start(merged.peaks.genome) = start(merged.peaks.genome)-1
+  GenomicRanges::start(merged.peaks.genome) = GenomicRanges::start(merged.peaks.genome)-1
   merged.peaks.genome.df = data.frame(merged.peaks.genome, stringsAsFactors = F)
   colnames(merged.peaks.genome.df) = c("chr", "start", "end", "width", "strand", "name", "weights", "i", "j")
   PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))

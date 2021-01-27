@@ -14,7 +14,9 @@ Imports:
   ggplot2,
   reshape2,
   Sushi,
-  metap
+  metap,
+	S4Vectors,
+	AnnotationDbi
 Suggests:
 	knitr,
 	rmarkdown,

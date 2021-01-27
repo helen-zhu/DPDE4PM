@@ -28,8 +28,8 @@
 
   # Finding Overlaps
   overlaps = GenomicRanges::findOverlaps(MERGED.PEAKS, PEAKSGR)
-  overlapping_peaks = PEAKSGR[subjectHits(overlaps)]
-  overlapping_peaks$merged_peak = MERGED.PEAKS$tag[queryHits(overlaps)]
+  overlapping_peaks = PEAKSGR[S4Vectors::subjectHits(overlaps)]
+  overlapping_peaks$merged_peak = MERGED.PEAKS$tag[S4Vectors::queryHits(overlaps)]
   overlapping_peaks$tag = paste0(overlapping_peaks$sample, ":", overlapping_peaks$merged_peak)
 
   overlapping_peaks = split(overlapping_peaks, overlapping_peaks$tag)

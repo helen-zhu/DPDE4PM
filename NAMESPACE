@@ -2,10 +2,6 @@
 
 S3method(plot,gene.peaks)
 export(DPDE4PM)
-importFrom(ggplot2,aes)
-importFrom(ggplot2,geom_histogram)
-importFrom(ggplot2,geom_line)
-importFrom(ggplot2,ggplot)
 importFrom(grDevices,dev.off)
 importFrom(grDevices,pdf)
 importFrom(grDevices,rainbow)
