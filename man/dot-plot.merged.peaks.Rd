@@ -2,31 +2,27 @@
 % Please edit documentation in R/plot.merged.peaks.R
 \name{.plot.merged.peaks}
 \alias{.plot.merged.peaks}
-\title{Title}
+\title{Makes a plot of the merged peaks and the fitted curve}
 \usage{
 .plot.merged.peaks(
   plot.startvec,
   plot.fit.frame,
   plot.bin.counts,
-  plot.dp,
   plot.merged.peaks,
   PARAMETERS
 )
 }
 \arguments{
-\item{plot.startvec}{}
+\item{plot.startvec}{A data frame of the points surveyed}
 
-\item{plot.fit.frame}{}
+\item{plot.fit.frame}{A data frame with the fitted Dirichlet process model on the points in the startvec}
 
-\item{plot.bin.counts}{}
+\item{plot.bin.counts}{A data frame of the coverage at a base pair resolution}
 
-\item{plot.dp}{}
+\item{plot.merged.peaks}{A GRanges object containing the RNA coordinates of the merged peaks in BED6 format}
 
-\item{PARAMETERS}{}
-}
-\value{
-
+\item{PARAMETERS}{A PARAMETERS list with the parameters indicated in the DPDE4PM function}
 }
 \description{
-Title
+Makes a plot of the merged peaks and the fitted curve
 }

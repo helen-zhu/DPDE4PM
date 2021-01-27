@@ -1,11 +1,18 @@
-#' Title
+#' read.gtf is a function that imports a gtf file and creates an annotation data frame, adapted from exomePeak
 #'
-#' @param PARAMETERS
+#' @param PARAMETERS A PARAMETERS list with the parameters indicated in the DPDE4PM function
 #'
 #' @return
-#' @export
+#' \describe{
+#'  \item{chr}{chromosome}
+#'  \item{feature}{genomic feature}
+#'  \item{start}{start coordinate, base 1}
+#'  \item{end}{stop coordinate, base 1}
+#'  \item{strand}{strand}
+#'  \item{gene}{gene id in the GTF file}
+#'  \item{transcript}{transcript id in the GTF fiile}
+#' }
 #'
-#' @examples
 .read.gtf <- function(PARAMETERS){
 
   # Creating a TXDB

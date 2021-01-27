@@ -1,12 +1,23 @@
 
-#' Title
+#' Creates a pile up of bed files using the Sushi R package
 #'
-#' @param GENE
-#' @param PEAKS
-#' @param GTF
-#' @param OUTPUTDIR
+#' @param GENE A 'character' gene id corresponding to the gene_id's found in the GTF files and the 'name' column in the peak files
+#' @param PEAKS data frame containing the following columns, and potentially extras, usually found in a BED12 file, base 0 system
+#' \describe{
+#'   \item{chr}{chromosomes, same as in GTF file}
+#'   \item{start}{starting position of the peak, base 0}
+#'   \item{end}{end position of the peak, base 0}
+#'   \item{name}{gene id}
+#'   \item{score}{p-value associated with the peak}
+#'   \item{strand}{strand of the gene}
+#'   \item{blockCount}{number of segments in the peak}
+#'   \item{blockSizes}{size of segments in the peak, BED12 notation}
+#'   \item{blockStarts}{starting positions of segments, BED12 notation}
+#'   \item{sample}{sample_id of samples}
+#' }
+#' @param GTF The GTF file used to generate the peaks. This is used to determine the genomic coordinates of the gene.
+#' @param OUTPUTDIR Output directory
 #'
-#' @return
 #' @export
 #'
 #' @examples
@@ -14,7 +25,7 @@ plot.gene.peaks = function(
   GENE,
   PEAKS,
   GTF,
-  OUTPUTDIR = "~/figures"
+  OUTPUTDIR = "."
 ){
 
   # Making a list of parameters to pass back and forth
@@ -50,7 +61,7 @@ plot.gene.peaks = function(
   par(mar=c(0,4,0,4))
   par(oma=c(8,3,3,3))
 
-  plotBed(
+  Sushi::plotBed(
     peak.bed,
     chrom = gene.chr,
     chromstart = gene.chromstart,
@@ -71,13 +82,13 @@ plot.gene.peaks = function(
     line=0.5,
     font=2
   )
-  plotBed(
+  Sushi::plotBed(
     gene.bed,
     chrom = gene.chr,
     chromstart = gene.chromstart,
     chromend = gene.chromend
   )
-  labelgenome(
+  Sushi::labelgenome(
     gene.chr,
     gene.chromstart,
     gene.chromend,

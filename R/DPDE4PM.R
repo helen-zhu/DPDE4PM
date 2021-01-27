@@ -1,13 +1,36 @@
-#' Title
+#' DPDE4PM merged RNA-seq peaks called on different samples
 #'
-#' @param GENE
-#' @param PEAKS
-#' @param GTF
-#' @param RESOLUTION
-#' @param DP.ITERATIONS
-#' @param OUTPUTDIR
+#' @param GENE A 'character' gene id corresponding to the gene_id's found in the GTF files and the 'name' column in the peak files
+#' @param PEAKS A data frame containing the following columns, and potentially extras, usually found in a BED12 file, base 0 system
+#' \describe{
+#'   \item{chr}{chromosomes, same as in GTF file}
+#'   \item{start}{starting position of the peak, base 0}
+#'   \item{end}{end position of the peak, base 0}
+#'   \item{name}{gene id}
+#'   \item{score}{p-value associated with the peak}
+#'   \item{strand}{strand of the gene}
+#'   \item{blockCount}{number of segments in the peak}
+#'   \item{blockSizes}{size of segments in the peak, BED12 notation}
+#'   \item{blockStarts}{starting positions of segments, BED12 notation}
+#'   \item{sample}{sample_id of samples}
+#' }
+#' @param GTF The GTF file used to generate the peaks. This is used to determine the genomic coordinates of the gene.
+#' @param RESOLUTION The width (bps) used to sample points from the peaks. This is likely optimized by choosing the window size used to generate the peaks.
+#' @param DP.ITERATIONS Number of iterations used to fit the Dirichlet Process
+#' @param OUTPUTDIR Output directory
+#' @param WEIGHT.THRESHOLD A proportion (out of 1) used to determine the percentage of data accounted for by the GMM to be called a peak
+#' @param N.SD Number of standard deviations from the mean for each fitted Gaussian that should considered part of the joint peak
+#' @param PLOT.RESULT TRUE or FALSE, whether plots should be generated
+#' @param WRITE.OUTPUT TRUE or FALSE, whether an output file should be saved
 #'
-#' @return
+#' @return A dataframe with BED12 columns and additional columns for each sample in the PEAKS dataframe and associated p-value with that peak.
+#'
+#' @importFrom grDevices dev.off pdf rainbow
+#' @importFrom graphics layout mtext par
+#' @importFrom stats end sd start
+#' @importFrom utils write.table
+#' @importFrom ggplot2 ggplot aes geom_histogram geom_line
+#'
 #' @export
 #'
 #' @examples
@@ -131,7 +154,7 @@ DPDE4PM = function(
 
   # Plotting
   if(PARAMETERS$PLOT.RESULT){
-    .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.dp, plot.merged.peaks, PARAMETERS)
+    .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.merged.peaks, PARAMETERS)
   }
 
   # Return a Data Frame of Merged Peaks
