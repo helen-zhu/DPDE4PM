@@ -84,7 +84,7 @@ DPDE4PM = function(
   GenomicRanges::end(GENEPEAKSGR) = GENEINFO$DNA2RNA[GenomicRanges::end(GENEPEAKSGR)]
 
   # Reduce Overlapping Peaks in the Same Sample
-  GENEPEAKSGR = split(GENEPEAKSGR, GENEPEAKSGR$sample)
+  GENEPEAKSGR = S4Vectors::split(GENEPEAKSGR, GENEPEAKSGR$sample)
   GENEPEAKSGR = unlist(GenomicRanges::reduce(GENEPEAKSGR))
 
   # Creating some big peaks
