@@ -16,7 +16,8 @@ DPDE4PM(
   PLOT.RESULT = F,
   WRITE.OUTPUT = T,
   OUTPUT.TAG = "",
-  ALPHA.PRIORS = c(1, 2)
+  ALPHA.PRIORS = c(1, 2),
+  SEED = 123
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ DPDE4PM(
 \item{OUTPUT.TAG}{A character string indicating a tag to track the generated files}
 
 \item{ALPHA.PRIORS}{A length 2 numeric vector indicating alpha, beta of the Gamma distribution from which the concentration weight parameter alpha is drawn, see the R package dirichletprocess}
+
+\item{SEED}{a seed for reproducibility}
 }
 \value{
 A dataframe with BED12 columns and additional columns for each sample in the PEAKS dataframe and associated p-value with that peak.

@@ -24,6 +24,7 @@
 #' @param WRITE.OUTPUT TRUE or FALSE, whether an output file should be saved
 #' @param OUTPUT.TAG A character string indicating a tag to track the generated files
 #' @param ALPHA.PRIORS A length 2 numeric vector indicating alpha, beta of the Gamma distribution from which the concentration weight parameter alpha is drawn, see the R package dirichletprocess
+#' @param SEED a seed for reproducibility
 #'
 #' @return A dataframe with BED12 columns and additional columns for each sample in the PEAKS dataframe and associated p-value with that peak.
 #'
@@ -47,7 +48,8 @@ DPDE4PM = function(
   PLOT.RESULT=F,
   WRITE.OUTPUT=T,
   OUTPUT.TAG="",
-  ALPHA.PRIORS = c(1,2)
+  ALPHA.PRIORS = c(1,2),
+  SEED = 123
 ){
 
   # Making a list of parameters to pass back and forth
@@ -63,6 +65,7 @@ DPDE4PM = function(
   PARAMETERS$WRITE.OUTPUT = WRITE.OUTPUT
   PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
   PARAMETERS$ALPHA.PRIORS = ALPHA.PRIORS
+  PARAMETERS$SEED = SEED
 
   # Error messages
   # 1. Check if OUTPUTDIR exists
@@ -110,6 +113,7 @@ DPDE4PM = function(
     startvec.sd = sd(as.vector(startvec$start))
     startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
 
+    set.seed(PARAMETERS$SEED)
     dp = dirichletprocess::DirichletProcessGaussian(
       y = startvec.scaled,
       g0Priors = c(0, 1, 1, 1),
