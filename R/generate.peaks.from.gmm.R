@@ -37,6 +37,8 @@
     "j" = seq(1, nrow(dp_data), 1),
     stringsAsFactors = F
   )
+  merged.peaks$start = ifelse(merged.peaks$start < 1, 1, merged.peaks$start)
+  merged.peaks$end = ifelse(merged.peaks$end > GENEINFO$exome_length,  GENEINFO$exome_length, merged.peaks$end)
 
   # Filtering Overlapping Peaks
   merged.peaks.gr =  GenomicRanges::makeGRangesFromDataFrame(merged.peaks, keep.extra.columns = T)
