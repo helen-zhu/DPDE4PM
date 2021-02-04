@@ -11,7 +11,7 @@
 #'  \item{end}{stop coordinate, base 1}
 #'  \item{strand}{strand}
 #'  \item{gene}{gene id in the GTF file}
-#'  \item{transcript}{transcript id in the GTF fiile}
+#'  \item{transcript}{transcript id in the GTF file}
 #' }
 #' @param PARAMETERS A PARAMETERS list with the parameters indicated in the DPDE4PM function
 #' @param ID.COLS Column names of columns whose unique values are used to merge peaks
