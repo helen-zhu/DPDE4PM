@@ -19,7 +19,7 @@
  \item{end}{stop coordinate, base 1}
  \item{strand}{strand}
  \item{gene}{gene id in the GTF file}
- \item{transcript}{transcript id in the GTF fiile}
+ \item{transcript}{transcript id in the GTF file}
 }}
 
 \item{PARAMETERS}{A PARAMETERS list with the parameters indicated in the DPDE4PM function}

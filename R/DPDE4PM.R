@@ -33,7 +33,7 @@
 #' @importFrom stats end sd start
 #' @importFrom utils write.table
 #'
-#' @export
+#' @export DPDE4PM
 #'
 #' @examples
 DPDE4PM = function(
@@ -79,7 +79,7 @@ DPDE4PM = function(
   GENEINFO = .get.gene.anno(PARAMETERS, ANNOTATION)
 
   # Turning PEAKS into a GRanges Object
-  PEAKSGR = .retrieve.peaks.as.granges(PEAKS, GENEINFO)
+  PEAKSGR = .retrieve.peaks.as.granges(PEKAKS = PEAKS, GENE = GENEINFO$gene, DF = F)
 
   # Converting to RNA
   GENEPEAKSGR = GenomicRanges::shift(PEAKSGR, -1*GENEINFO$left+1)

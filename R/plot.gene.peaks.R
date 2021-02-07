@@ -19,7 +19,7 @@
 #' @param OUTPUTDIR Output directory
 #' @param OUTPUT.TAG A character string indicating a tag to track the generated files
 #'
-#' @export
+#' @export plot.gene.peaks
 #'
 #' @examples
 plot.gene.peaks = function(
@@ -39,65 +39,38 @@ plot.gene.peaks = function(
   PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
 
   # Import GTF as a GRanges Object
-  ANNOTATION = .read.gtf(PARAMETERS)
+  ANNOTATION = DPDE4PM:::.read.gtf(PARAMETERS)
+
+  # Plotting Peaks
+  plotting.peaks = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = PARAMETERS$GENE, DF = T)
 
   # Gene Bed
   gene.bed = ANNOTATION[ANNOTATION$gene == PARAMETERS$GENE, c("chr", "start", "stop", "gene", "strand")]
   gene.chr = unique(gene.bed$chr)
-  gene.chromstart = min(gene.bed$start) - 100
-  gene.chromend = max(gene.bed$stop) + 100
-
-  # Peak Bed
-  peak.bed = PEAKS[PEAKS$name == PARAMETERS$GENE,]
-  unique.samples = unique(peak.bed$sample)
-  sample_number = structure(1:length(unique.samples), names = unique.samples)
-  peak.bed$row = sample_number[peak.bed$sample]
-  sample_colour = structure(rainbow(length(unique.samples)), names = unique.samples)
-  peak.bed$col = sample_colour[peak.bed$sample]
 
   # Plotting
   filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".Peaks.pdf")
   pdf(filename)
 
-  layout(matrix(c(1,2),2, 1, byrow = TRUE), heights = c(0.9,0.1))
-  # Bottom, Left, Top, Right
-  par(mar=c(0,4,0,4))
-  par(oma=c(8,3,3,3))
+  # Code for ggplot
+  p1 = ggplot(plotting.peaks, aes(y = sample, x = start, xend = end)) +
+    geom_dumbbell() +
+    theme_classic() +
+    theme(axis.text.y = element_text(size = 0),
+          axis.ticks.y = element_blank()) +
+    ggtitle(PARAMETERS$GENE) +
+    xlab(gene.chr) + ylab("Sample")
 
-  Sushi::plotBed(
-    peak.bed,
-    chrom = gene.chr,
-    chromstart = gene.chromstart,
-    chromend = gene.chromend,
-    # Type
-    # type = "circles",
-    # Colors
-    color=peak.bed$col,
-    # Rows
-    row = "given",
-    rownumber = peak.bed$row
-    # rowlabels = unique.samples
-  )
-  mtext(
-    PARAMETERS$GENE,
-    side=3,
-    adj=-0.065,
-    line=0.5,
-    font=2
-  )
-  Sushi::plotBed(
-    gene.bed,
-    chrom = gene.chr,
-    chromstart = gene.chromstart,
-    chromend = gene.chromend
-  )
-  Sushi::labelgenome(
-    gene.chr,
-    gene.chromstart,
-    gene.chromend,
-    n=2,
-    scale="Kb"
-  )
+  p1 = p1 + annotate("rect",
+                     xmin=gene.bed$start,
+                     xmax=gene.bed$stop,
+                     ymin=-2,
+                     ymax=0,
+                     alpha=0.2,
+                     color="black",
+                     fill=rainbow(nrow(gene.bed)))
+  print(p1)
+
   dev.off()
 
 }
