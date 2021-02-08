@@ -23,8 +23,8 @@
   pdf(filename)
 
   p1 = ggplot2::ggplot() +
-    ggplot2::geom_histogram(data=plot.startvec, ggplot2::aes(x=start), binwidth = 50, colour = "black", fill="white") +
-    ggplot2::geom_line(data=plot.fit.frame, ggplot2::aes(x=x, y=y), colour='red') +
+    ggplot2::geom_histogram(data=plot.startvec, ggplot2::aes(x=start), binwidth = 50, colour = "grey", fill="white") +
+    ggplot2::geom_line(data=plot.fit.frame, ggplot2::aes(x=x, y=y), colour='black') +
     ggplot2::theme_bw() +
     ggplot2::ggtitle(PARAMETERS$GENE) +
     ggplot2::ylab("Binned Counts From Peaks (Used to Fit GMM)") +
@@ -37,13 +37,13 @@
   print(p1)
 
   p2 = ggplot2::ggplot() +
-    ggplot2::geom_line(data=plot.bin.counts, ggplot2::aes(x=start, y=Coverage), colour='blue') +
-    ggplot2::geom_line(data=plot.fit.frame, ggplot2::aes(x=x,y=y), colour='red') +
+    ggplot2::geom_line(data=plot.bin.counts, ggplot2::aes(x=start, y=Coverage), colour='grey') +
+    ggplot2::geom_line(data=plot.fit.frame, ggplot2::aes(x=x,y=y), colour='black') +
     ggplot2::theme_bw() +
     ggplot2::ggtitle(PARAMETERS$GENE) +
     ggplot2::ylab("Coverage (at BP resolution)") +
     ggplot2::xlab("Transcript Coordinate") +
-    ggplot2::annotate("rect", xmin=merged.peaks.df$start, xmax=merged.peaks.df$end, ymin=-1 , ymax=-0.1, alpha=0.5, color="black", fill=rainbow(nrow(merged.peaks.df)))
+    ggplot2::annotate("rect", xmin=merged.peaks.df$start, xmax=merged.peaks.df$end, ymin=-1 , ymax=-0.1, alpha=0.5, color="black", fill=nrow(merged.peaks.df))
 
   p2 = p2 + geom_line(data = melted.plot.dp.data, ggplot2::aes(x=sample.points, y=value, color = variable)) +
     theme(legend.position = "none")

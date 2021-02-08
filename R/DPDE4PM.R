@@ -166,10 +166,13 @@ DPDE4PM = function(
 
   # Plotting DP data
   sample.points = seq(1, GENEINFO$exome_length, 10)
+  scaling.factor = length(unique(PEAKSGR$sample))*100
   plot.dp.data = data.frame("sample.points" = sample.points, stringsAsFactors = F)
-  for(i in 1:nrow(dp_data)){
-    plot.dp.data [,i+1]= dnorm(sample.points, mean = dp_data$Mu[i], sd = dp_data$Sigma[i])*dp_data$Weights[i]*max(BIN.COUNTS$Coverage)*1000
+  for(i in 1:nrow(plot.dp)){
+    norm.tmp = dnorm(sample.points, mean = plot.dp$Mu[i], sd = plot.dp$Sigma[i])*plot.dp$Weights[i]*scaling.factor
+    plot.dp.data = cbind(plot.dp.data, norm.tmp)
   }
+  colnames(plot.dp.data) = c("sample.points", paste0("V", 1:nrow(plot.dp)))
 
   # Plotting
   if(PARAMETERS$PLOT.RESULT){
