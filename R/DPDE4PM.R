@@ -79,7 +79,7 @@ DPDE4PM = function(
   GENEINFO = .get.gene.anno(PARAMETERS, ANNOTATION)
 
   # Turning PEAKS into a GRanges Object
-  PEAKSGR = .retrieve.peaks.as.granges(PEKAKS = PEAKS, GENE = GENEINFO$gene, DF = F)
+  PEAKSGR = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = GENEINFO$gene, DF = F)
 
   # Converting to RNA
   GENEPEAKSGR = GenomicRanges::shift(PEAKSGR, -1*GENEINFO$left+1)
