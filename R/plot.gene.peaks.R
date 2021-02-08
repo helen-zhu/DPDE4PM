@@ -35,7 +35,6 @@ plot.gene.peaks = function(
   # Making a list of parameters to pass back and forth
   PARAMETERS = list()
   PARAMETERS$GENE = GENE
-  # PARAMETERS$PEAKS = PEAKS
   PARAMETERS$GTF = GTF
   PARAMETERS$OUTPUTDIR = OUTPUTDIR
   PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
@@ -51,6 +50,7 @@ plot.gene.peaks = function(
   gene.chr = unique(gene.bed$chr)
 
   # Code for ggplot
+  options(warn = -1)
   p1 = ggplot2::ggplot(plotting.peaks, ggplot2::aes(y = sample, x = start, xend = end)) +
     ggalt::geom_dumbbell() +
     ggplot2::theme_classic() +
@@ -69,6 +69,7 @@ plot.gene.peaks = function(
     color="black",
     fill=rainbow(nrow(gene.bed))
     )
+  options(warn = 0)
 
   if(PLOT){
     filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".Peaks.pdf")

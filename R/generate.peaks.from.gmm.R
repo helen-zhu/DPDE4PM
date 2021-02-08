@@ -19,7 +19,7 @@
   # Filtering by Threshold
   dp_data = dp_data[dp_data$Weights > PARAMETERS$WEIGHT.THRESHOLD,]
   if(nrow(dp_data) == 0){
-    warning("No Peaks Survive Past The Threshold. Consider Lowering Requirements or Tuning Parameters.",
+    warning("No Peaks Survive Past The Weight Threshold. Consider Lowering Requirements or Tuning Parameters.",
             call. = TRUE, domain = NULL)
     return(list(GenomicRanges::GRanges(),  GenomicRanges::GRanges()))
   }
@@ -40,17 +40,32 @@
   merged.peaks$start = ifelse(merged.peaks$start < 1, 1, merged.peaks$start)
   merged.peaks$end = ifelse(merged.peaks$end > GENEINFO$exome_length,  GENEINFO$exome_length, merged.peaks$end)
 
-  # Filtering Overlapping Peaks
+  # Filtering peaks where 1 peak is within the other peak
   merged.peaks.gr =  GenomicRanges::makeGRangesFromDataFrame(merged.peaks, keep.extra.columns = T)
-  merged.peaks.filtered.rna = do.call(c, lapply(1:length(merged.peaks.gr), function(i){
+  within.peaks = GenomicRanges::findOverlaps(merged.peaks.gr, merged.peaks.gr, type = "within")
+  within.peaks = within.peaks[S4Vectors::subjectHits(within.peaks) != S4Vectors::queryHits(within.peaks)]
+  if(length(within.peaks) > 0){
+    wid = IRanges::width(merged.peaks.gr)
+    remove.elements = ifelse(wid[S4Vectors::queryHits(within.peaks)] > wid[S4Vectors::subjectHits(within.peaks)], S4Vectors::subjectHits(within.peaks), S4Vectors::queryHits(within.peaks))
+    merged.peaks.gr = merged.peaks.gr[!1:length(merged.peaks.gr) %in% remove.elements]
+  }
+
+  # Subtracting Overlapping Regions
+  merged.peaks.filtered.rna = GenomicRanges::GRanges()
+  for ( i in 1:length(merged.peaks.gr)){
     if(i == 1){
-      tmp = merged.peaks.gr[1]
+      tmp.gr = merged.peaks.gr[1]
     }else{
-      tmp = GenomicRanges::setdiff(merged.peaks.gr[i], merged.peaks.gr[1:(i-1)])
-      if(length(tmp) > 0){S4Vectors::mcols(tmp) = S4Vectors::mcols(merged.peaks.gr[i])}
+      tmp.gr = GenomicRanges::setdiff(merged.peaks.gr[i], merged.peaks.gr[1:(i-1)])
+      if(length(tmp.gr) > 0){S4Vectors::mcols(tmp.gr) = S4Vectors::mcols(merged.peaks.gr[i])}
     }
-    tmp
-  }))
+    merged.peaks.filtered.rna = c(merged.peaks.filtered.rna, tmp.gr)
+  }
+
+  # Removing peaks that are below resolution
+  wid = IRanges::width(merged.peaks.filtered.rna)
+  remove.elements = which(wid < PARAMETERS$RESOLUTION)
+  merged.peaks.filtered.rna = merged.peaks.filtered.rna[!1:length(merged.peaks.filtered.rna) %in% remove.elements]
 
   # Transferring to Genomic Coordinates
   merged.peaks.genome = merged.peaks.filtered.rna
@@ -59,11 +74,13 @@
   anno_gr = GenomicRanges::makeGRangesFromDataFrame(GENEINFO$anno)
 
   # Filtering Out Introns
-  merged.peaks.filtered.genome = do.call(c, lapply(1:length(merged.peaks.genome), function(i){
-      tmp = GenomicRanges::intersect(merged.peaks.genome[i], anno_gr)
-      if(length(tmp) > 0){S4Vectors::mcols(tmp) = S4Vectors::mcols(merged.peaks.genome[i])}
-      tmp
-  }))
+  merged.peaks.filtered.genome = GenomicRanges::GRanges()
+  for(i in 1:length(merged.peaks.genome)){
+    tmp.gr = GenomicRanges::intersect(merged.peaks.genome[i], anno_gr)
+    if(length(tmp.gr) > 0){S4Vectors::mcols(tmp.gr) = S4Vectors::mcols(merged.peaks.genome[i])}
+    merged.peaks.filtered.genome = c(merged.peaks.filtered.genome, tmp.gr)
+  }
+
 
   return(list(merged.peaks.filtered.rna, merged.peaks.filtered.genome))
 }

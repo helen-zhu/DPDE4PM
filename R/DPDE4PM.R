@@ -68,7 +68,10 @@ DPDE4PM = function(
   PARAMETERS$SEED = SEED
 
   # Error messages
-  # 1. Check if OUTPUTDIR exists
+  # Check if OUTPUTDIR exists
+  if(!dir.exists(PARAMETERS$OUTPUTDIR)){
+    dir.create(PARAMETERS$OUTPUTDIR, recursive = T)
+  }
   # 2. Check if peaks are in the right format
   # 3. Check if gene is in peaks & gtf
 
@@ -161,9 +164,16 @@ DPDE4PM = function(
     merged.peaks.genome = c(merged.peaks.genome, merged.peaks.gen)
   }
 
+  # Plotting DP data
+  sample.points = seq(1, GENEINFO$exome_length, 10)
+  plot.dp.data = data.frame("sample.points" = sample.points, stringsAsFactors = F)
+  for(i in 1:nrow(dp_data)){
+    plot.dp.data [,i+1]= dnorm(sample.points, mean = dp_data$Mu[i], sd = dp_data$Sigma[i])*dp_data$Weights[i]*max(BIN.COUNTS$Coverage)*1000
+  }
+
   # Plotting
   if(PARAMETERS$PLOT.RESULT){
-    .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.merged.peaks, PARAMETERS)
+    .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.merged.peaks, plot.dp.data, PARAMETERS)
   }
 
   # Return a Data Frame of Merged Peaks

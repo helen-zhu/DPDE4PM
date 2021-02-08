@@ -10,7 +10,7 @@
 
   PEAKS = PEAKS[PEAKS$name == GENE,]
 
-  # Verify that all the columns have the
+  # Creating a BED6 File
   BED6 = data.frame(stringsAsFactors = F)
   for(i in 1:nrow(PEAKS)){
     tmp = data.frame(

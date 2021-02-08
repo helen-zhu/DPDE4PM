@@ -9,6 +9,7 @@
   plot.fit.frame,
   plot.bin.counts,
   plot.merged.peaks,
+  plot.dp.data,
   PARAMETERS
 )
 }
@@ -20,6 +21,8 @@
 \item{plot.bin.counts}{A data frame of the coverage at a base pair resolution}
 
 \item{plot.merged.peaks}{A GRanges object containing the RNA coordinates of the merged peaks in BED6 format}
+
+\item{plot.dp.data}{A data frame of individual normal distributions fitted}
 
 \item{PARAMETERS}{A PARAMETERS list with the parameters indicated in the DPDE4PM function}
 }
