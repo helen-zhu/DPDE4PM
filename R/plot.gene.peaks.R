@@ -18,6 +18,7 @@
 #' @param GTF The GTF file used to generate the peaks. This is used to determine the genomic coordinates of the gene.
 #' @param OUTPUTDIR Output directory
 #' @param OUTPUT.TAG A character string indicating a tag to track the generated files
+#' @param PLOT Binary T or F indicating whether to save plot or just return plot
 #'
 #' @export plot.gene.peaks
 #'
@@ -27,7 +28,8 @@ plot.gene.peaks = function(
   PEAKS,
   GTF,
   OUTPUTDIR = ".",
-  OUTPUT.TAG = ""
+  OUTPUT.TAG = "",
+  PLOT = T
 ){
 
   # Making a list of parameters to pass back and forth
@@ -39,7 +41,7 @@ plot.gene.peaks = function(
   PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
 
   # Import GTF as a GRanges Object
-  ANNOTATION = DPDE4PM:::.read.gtf(PARAMETERS)
+  ANNOTATION = .read.gtf(PARAMETERS)
 
   # Plotting Peaks
   plotting.peaks = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = PARAMETERS$GENE, DF = T)
@@ -47,10 +49,6 @@ plot.gene.peaks = function(
   # Gene Bed
   gene.bed = ANNOTATION[ANNOTATION$gene == PARAMETERS$GENE, c("chr", "start", "stop", "gene", "strand")]
   gene.chr = unique(gene.bed$chr)
-
-  # Plotting
-  filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".Peaks.pdf")
-  pdf(filename)
 
   # Code for ggplot
   p1 = ggplot(plotting.peaks, aes(y = sample, x = start, xend = end)) +
@@ -69,8 +67,12 @@ plot.gene.peaks = function(
                      alpha=0.2,
                      color="black",
                      fill=rainbow(nrow(gene.bed)))
-  print(p1)
+  if(PLOT){
+    filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".Peaks.pdf")
+    pdf(filename)
+    print(p1)
+    dev.off()
+  }
 
-  dev.off()
-
+  return(p1)
 }

@@ -4,7 +4,7 @@
 \alias{plot.gene.peaks}
 \title{Creates a pile up of bed files using the Sushi R package}
 \usage{
-\method{plot}{gene.peaks}(GENE, PEAKS, GTF, OUTPUTDIR = ".", OUTPUT.TAG = "")
+\method{plot}{gene.peaks}(GENE, PEAKS, GTF, OUTPUTDIR = ".", OUTPUT.TAG = "", PLOT = T)
 }
 \arguments{
 \item{GENE}{A 'character' gene id corresponding to the gene_id's found in the GTF files and the 'name' column in the peak files}
@@ -28,6 +28,8 @@
 \item{OUTPUTDIR}{Output directory}
 
 \item{OUTPUT.TAG}{A character string indicating a tag to track the generated files}
+
+\item{PLOT}{Binary T or F indicating whether to save plot or just return plot}
 }
 \description{
 Creates a pile up of bed files using the Sushi R package
