@@ -51,22 +51,25 @@ plot.gene.peaks = function(
   gene.chr = unique(gene.bed$chr)
 
   # Code for ggplot
-  p1 = ggplot(plotting.peaks, aes(y = sample, x = start, xend = end)) +
-    geom_dumbbell() +
-    theme_classic() +
-    theme(axis.text.y = element_text(size = 0),
-          axis.ticks.y = element_blank()) +
-    ggtitle(PARAMETERS$GENE) +
-    xlab(gene.chr) + ylab("Sample")
+  p1 = ggplot2::ggplot(plotting.peaks, ggplot2::aes(y = sample, x = start, xend = end)) +
+    ggalt::geom_dumbbell() +
+    ggplot2::theme_classic() +
+    ggplot2::theme(axis.text.y = ggplot2::element_text(size = 0),
+                   axis.ticks.y = ggplot2::element_blank()) +
+    ggplot2::ggtitle(PARAMETERS$GENE) +
+    ggplot2::xlab(gene.chr) + ggplot2::ylab("Sample")
 
-  p1 = p1 + annotate("rect",
-                     xmin=gene.bed$start,
-                     xmax=gene.bed$stop,
-                     ymin=-2,
-                     ymax=0,
-                     alpha=0.2,
-                     color="black",
-                     fill=rainbow(nrow(gene.bed)))
+  p1 = p1 + ggplot2::annotate(
+    "rect",
+    xmin=gene.bed$start,
+    xmax=gene.bed$stop,
+    ymin=-2,
+    ymax=0,
+    alpha=0.2,
+    color="black",
+    fill=rainbow(nrow(gene.bed))
+    )
+
   if(PLOT){
     filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".Peaks.pdf")
     pdf(filename)
