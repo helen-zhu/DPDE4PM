@@ -113,7 +113,8 @@ DPDE4PM = function(
 
     # Dirichlet Process
     startvec.mean = mean(as.vector(startvec$start))
-    startvec.sd = ifelse(is.na(sd(as.vector(startvec$start))), 1, sd(as.vector(startvec$start))) # This is for when there's 1 short peak
+    startvec.sd = sd(as.vector(startvec$start))
+    startvec.sd = ifelse( is.na(startvec.sd) | startvec.sd == 0, 1, startvec.sd) # This is for when there's 1 short peak or all samples have the exact same peak
     startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
 
     set.seed(PARAMETERS$SEED)
