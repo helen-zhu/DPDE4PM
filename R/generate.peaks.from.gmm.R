@@ -18,8 +18,9 @@
 
   # Filtering by Threshold
   dp_data = dp_data[dp_data$Weights > PARAMETERS$WEIGHT.THRESHOLD,]
+  dp_data = dp_data[complete.cases(dp_data),]
   if(nrow(dp_data) == 0){
-    warning("No Peaks Survive Past The Weight Threshold. Consider Lowering Requirements or Tuning Parameters.",
+    warning("No Peaks Survive Past The Weight Threshold or DP could not fit reasonable Gaussians. Consider Lowering Requirements or Tuning Parameters.",
             call. = TRUE, domain = NULL)
     return(list(GenomicRanges::GRanges(),  GenomicRanges::GRanges()))
   }
@@ -63,9 +64,14 @@
   }
 
   # Removing peaks that are below resolution
-  wid = IRanges::width(merged.peaks.filtered.rna)
-  remove.elements = which(wid < PARAMETERS$RESOLUTION)
-  merged.peaks.filtered.rna = merged.peaks.filtered.rna[!1:length(merged.peaks.filtered.rna) %in% remove.elements]
+  # wid = IRanges::width(merged.peaks.filtered.rna)
+  # remove.elements = which(wid < PARAMETERS$RESOLUTION)
+  # merged.peaks.filtered.rna = merged.peaks.filtered.rna[!1:length(merged.peaks.filtered.rna) %in% remove.elements]
+  # if(length(merged.peaks.filtered.rna) == 0){
+  #   warning("No Peaks Survive After The Width Filter",
+  #           call. = TRUE, domain = NULL)
+  #   return(list(GenomicRanges::GRanges(),  GenomicRanges::GRanges()))
+  # }
 
   # Transferring to Genomic Coordinates
   merged.peaks.genome = merged.peaks.filtered.rna

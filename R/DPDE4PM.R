@@ -113,7 +113,7 @@ DPDE4PM = function(
 
     # Dirichlet Process
     startvec.mean = mean(as.vector(startvec$start))
-    startvec.sd = sd(as.vector(startvec$start))
+    startvec.sd = ifelse(is.na(sd(as.vector(startvec$start))), 1, sd(as.vector(startvec$start)))
     startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
 
     set.seed(PARAMETERS$SEED)
@@ -180,17 +180,23 @@ DPDE4PM = function(
   }
 
   # Return a Data Frame of Merged Peaks
-  GenomicRanges::start(merged.peaks.genome) = GenomicRanges::start(merged.peaks.genome)-1
-  merged.peaks.genome.df = data.frame(merged.peaks.genome, stringsAsFactors = F)
-  colnames(merged.peaks.genome.df) = c("chr", "start", "end", "width", "strand", "name", "weights", "i", "j")
-  PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))
+  if(length(merged.peaks.genome) == 0){
+    OUTPUT_TABLE = data.frame(matrix(ncol = 12, nrow = 0))
+    names(OUTPUT_TABLE) = c("chr", "start", "end", "name", "score", "strand", "thickStart", "thickEnd",
+                            "itemRgb", "blockCount", "blockSizes","blockStarts")
+  } else {
+    GenomicRanges::start(merged.peaks.genome) = GenomicRanges::start(merged.peaks.genome)-1
+    merged.peaks.genome.df = data.frame(merged.peaks.genome, stringsAsFactors = F)
+    colnames(merged.peaks.genome.df) = c("chr", "start", "end", "width", "strand", "name", "weights", "i", "j")
+    PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))
 
-  # Merging P-Values
-  SAMPLE.PVAL = .merge.p(PEAKSGR, MERGED.PEAKS = merged.peaks.genome, ANNOTATION, PARAMETERS, ID.COLS = c("name", "i", "j"))
+    # Merging P-Values
+    SAMPLE.PVAL = .merge.p(PEAKSGR, MERGED.PEAKS = merged.peaks.genome, ANNOTATION, PARAMETERS, ID.COLS = c("name", "i", "j"))
 
-  # Write Output Tables & Return Files
-  OUTPUT.TABLE = merge(PEAKS.FINAL, SAMPLE.PVAL, by = "peak", all = T)
-  OUTPUT.TABLE = OUTPUT.TABLE[,colnames(OUTPUT.TABLE) != "peak"]
+    # Write Output Tables & Return Files
+    OUTPUT.TABLE = merge(PEAKS.FINAL, SAMPLE.PVAL, by = "peak", all = T)
+    OUTPUT.TABLE = OUTPUT.TABLE[,colnames(OUTPUT.TABLE) != "peak"]
+  }
 
   if(PARAMETERS$WRITE.OUTPUT){
     filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".MergedPeaks.tsv")
