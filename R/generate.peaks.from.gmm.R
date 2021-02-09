@@ -40,6 +40,7 @@
   )
   merged.peaks$start = ifelse(merged.peaks$start < 1, 1, merged.peaks$start)
   merged.peaks$end = ifelse(merged.peaks$end > GENEINFO$exome_length,  GENEINFO$exome_length, merged.peaks$end)
+  merged.peaks = merged.peaks[!duplicated(merged.peaks[,c("chr", "start", "end", "name", "strand")]),]
 
   # Filtering peaks where 1 peak is within the other peak
   merged.peaks.gr =  GenomicRanges::makeGRangesFromDataFrame(merged.peaks, keep.extra.columns = T)
