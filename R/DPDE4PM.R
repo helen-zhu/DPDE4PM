@@ -113,7 +113,7 @@ DPDE4PM = function(
 
     # Dirichlet Process
     startvec.mean = mean(as.vector(startvec$start))
-    startvec.sd = ifelse(is.na(sd(as.vector(startvec$start))), 1, sd(as.vector(startvec$start)))
+    startvec.sd = ifelse(is.na(sd(as.vector(startvec$start))), 1, sd(as.vector(startvec$start))) # This is for when there's 1 short peak
     startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
 
     set.seed(PARAMETERS$SEED)
