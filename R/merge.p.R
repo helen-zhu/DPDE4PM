@@ -53,7 +53,7 @@
   missing.samples = setdiff(PARAMETERS$ALL.SAMPLES, colnames(pmat))
   if(length(missing.samples) > 0){
     add.table = data.frame(matrix(1, nrow = nrow(pmat), ncol = length(missing.samples), dimnames = list(NULL, missing.samples)))
-    pmat = cbind(peaks, add.table)
+    pmat = cbind(pmat, add.table)
   }
   pmat = pmat[,c("peak", PARAMETERS$ALL.SAMPLES)]
 
