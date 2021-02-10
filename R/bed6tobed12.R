@@ -26,20 +26,20 @@
 
   BED12 = do.call(rbind, lapply(unique(MERGED.PEAKS$tag), function(itag) {
     TMP.PEAK = MERGED.PEAKS[MERGED.PEAKS$tag == itag]
-    TMP.PEAK = TMP.PEAK[order(start(TMP.PEAK))]
+    TMP.PEAK = TMP.PEAK[order(GenomicRanges::start(TMP.PEAK))]
     bed12 = data.frame(
       "chr" = as.character(seqnames(TMP.PEAK))[1],
-      "start" = min(start(TMP.PEAK)),
-      "end" = max(end(TMP.PEAK)),
+      "start" = min(GenomicRanges::start(TMP.PEAK)),
+      "end" = max(GenomicRanges::end(TMP.PEAK)),
       "name" = mcols(TMP.PEAK)$name[1],
       "score" = 0, # This might be changed to a p-value if there is one
-      "strand" = strand(TMP.PEAK)[1],
-      "thickStart" = min(start(TMP.PEAK)),
-      "thickEnd" = max(end(TMP.PEAK)),
+      "strand" = as.character(GenomicRanges::strand(TMP.PEAK))[1],
+      "thickStart" = min(GenomicRanges::start(TMP.PEAK)),
+      "thickEnd" = max(GenomicRanges::end(TMP.PEAK)),
       "itemRgb" = 0,
       "blockCount" = length(TMP.PEAK),
-      "blockSizes" = paste0(paste(end(TMP.PEAK) - start(TMP.PEAK), collapse = ","), ","),
-      "blockStarts" = paste0(paste(start(TMP.PEAK) - min(start(TMP.PEAK)), collapse = ","), ","),
+      "blockSizes" = paste0(paste(GenomicRanges::end(TMP.PEAK) - GenomicRanges::start(TMP.PEAK), collapse = ","), ","),
+      "blockStarts" = paste0(paste(GenomicRanges::start(TMP.PEAK) - min(GenomicRanges::start(TMP.PEAK)), collapse = ","), ","),
       "peak" = itag,
       stringsAsFactors = F
       )
