@@ -186,9 +186,10 @@ DPDE4PM = function(
 
   # Return a Data Frame of Merged Peaks
   if(length(merged.peaks.genome) == 0){
-    OUTPUT_TABLE = data.frame(matrix(ncol = 12, nrow = 0))
+    output.ncol = length(PARAMETERS$ALL.SAMPLES) + 12
+    OUTPUT_TABLE = data.frame(matrix(ncol = output.ncol, nrow = 0))
     names(OUTPUT_TABLE) = c("chr", "start", "end", "name", "score", "strand", "thickStart", "thickEnd",
-                            "itemRgb", "blockCount", "blockSizes","blockStarts")
+                            "itemRgb", "blockCount", "blockSizes","blockStarts", PARAMETERS$ALL.SAMPLES)
   } else {
 
     # Creating a BED12 File
