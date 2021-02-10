@@ -75,6 +75,10 @@ DPDE4PM = function(
   # 2. Check if peaks are in the right format
   # 3. Check if gene is in peaks & gtf
 
+  # Making a vector of all samples so that the output is consistent
+  ALL.SAMPLES = sort(unique(PEAKS$sample))
+  PARAMETERS$ALL.SAMPLES = ALL.SAMPLES
+
   # Import GTF as a GRanges Object
   ANNOTATION = .read.gtf(PARAMETERS)
 
@@ -186,10 +190,10 @@ DPDE4PM = function(
     names(OUTPUT_TABLE) = c("chr", "start", "end", "name", "score", "strand", "thickStart", "thickEnd",
                             "itemRgb", "blockCount", "blockSizes","blockStarts")
   } else {
+
+    # Creating a BED12 File
     GenomicRanges::start(merged.peaks.genome) = GenomicRanges::start(merged.peaks.genome)-1
-    merged.peaks.genome.df = data.frame(merged.peaks.genome, stringsAsFactors = F)
-    colnames(merged.peaks.genome.df) = c("chr", "start", "end", "width", "strand", "name", "weights", "i", "j")
-    PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome.df, ID.COLS = c("name", "i", "j"))
+    PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome, ID.COLS = c("name", "i", "j"))
 
     # Merging P-Values
     SAMPLE.PVAL = .merge.p(PEAKSGR, MERGED.PEAKS = merged.peaks.genome, ANNOTATION, PARAMETERS, ID.COLS = c("name", "i", "j"))
