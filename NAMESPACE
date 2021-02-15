@@ -2,6 +2,7 @@
 
 export(DPDE4PM)
 export(plot.gene.peaks)
+export(read.gtf)
 importFrom(grDevices,dev.off)
 importFrom(grDevices,pdf)
 importFrom(grDevices,rainbow)

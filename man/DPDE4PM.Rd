@@ -8,6 +8,7 @@ DPDE4PM(
   GENE,
   PEAKS,
   GTF,
+  ANNOTATION,
   RESOLUTION = 50,
   DP.ITERATIONS = 1000,
   WEIGHT.THRESHOLD = 0.2,
@@ -38,6 +39,8 @@ DPDE4PM(
 }}
 
 \item{GTF}{The GTF file used to generate the peaks. This is used to determine the genomic coordinates of the gene.}
+
+\item{ANNOTATION}{A object created by the read.gtf function. This allows the user to provide an annotation object to save compute time during parallelization.}
 
 \item{RESOLUTION}{The width (bps) used to sample points from the peaks. This is likely optimized by choosing the window size used to generate the peaks.}
 

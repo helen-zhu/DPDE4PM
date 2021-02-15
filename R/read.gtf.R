@@ -13,7 +13,8 @@
 #'  \item{transcript}{transcript id in the GTF fiile}
 #' }
 #'
-.read.gtf <- function(PARAMETERS){
+#' @export read.gtf
+read.gtf <- function(PARAMETERS){
 
   # Creating a TXDB
   op <- options(warn = (-1))

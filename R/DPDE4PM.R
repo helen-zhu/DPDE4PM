@@ -15,6 +15,7 @@
 #'   \item{sample}{sample_id of samples}
 #' }
 #' @param GTF The GTF file used to generate the peaks. This is used to determine the genomic coordinates of the gene.
+#' @param ANNOTATION A object created by the read.gtf function. This allows the user to provide an annotation object to save compute time during parallelization.
 #' @param RESOLUTION The width (bps) used to sample points from the peaks. This is likely optimized by choosing the window size used to generate the peaks.
 #' @param DP.ITERATIONS Number of iterations used to fit the Dirichlet Process
 #' @param OUTPUTDIR Output directory
@@ -40,6 +41,7 @@ DPDE4PM = function(
   GENE,
   PEAKS,
   GTF,
+  ANNOTATION,
   RESOLUTION = 50,
   DP.ITERATIONS = 1000,
   WEIGHT.THRESHOLD = 0.2,
@@ -79,14 +81,20 @@ DPDE4PM = function(
   ALL.SAMPLES = sort(unique(PEAKS$sample))
   PARAMETERS$ALL.SAMPLES = ALL.SAMPLES
 
+  # Turning PEAKS into a GRanges Object
+  PEAKSGR = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = PARAMETERS$GENE, DF = F)
+
   # Import GTF as a GRanges Object
-  ANNOTATION = .read.gtf(PARAMETERS)
+  annot.format = F
+  if(!is.null(ANNOTATION)){
+    annot.format = .check.annotation(ANNOTATION, PEAKSGR, GENE = PARAMETERS$GENE)
+  }
+  if(!annot.format){
+    ANNOTATION = read.gtf(PARAMETERS)
+  }
 
   # Get Gene Information
   GENEINFO = .get.gene.anno(PARAMETERS, ANNOTATION)
-
-  # Turning PEAKS into a GRanges Object
-  PEAKSGR = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = GENEINFO$gene, DF = F)
 
   # Converting to RNA
   GENEPEAKSGR = GenomicRanges::shift(PEAKSGR, -1*GENEINFO$left+1)
