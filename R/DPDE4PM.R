@@ -106,90 +106,70 @@ DPDE4PM = function(
   GENEPEAKSGR = unlist(GenomicRanges::reduce(GENEPEAKSGR))
 
   # Creating some big peaks
-  REDUCED.GENE.PEAKS.GR = GenomicRanges::reduce(GENEPEAKSGR)
+  REDUCED.GENE.PEAKS.GR = reduce(GENEPEAKSGR)
 
-  # Initializing Data
-  plot.startvec = data.frame(stringsAsFactors = F)
-  plot.fit.frame = data.frame(stringsAsFactors = F)
-  plot.bin.counts = data.frame(stringsAsFactors = F)
-  plot.dp = data.frame(stringsAsFactors = F)
-  plot.merged.peaks = GenomicRanges::GRanges()
-  merged.peaks.genome = GenomicRanges::GRanges()
+  # Generating Data
+  TILED.PEAKS.GR = GenomicRanges::tile(GENEPEAKSGR, width = PARAMETERS$RESOLUTION)
+  startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
 
-  for(i in 1:length(REDUCED.GENE.PEAKS.GR)){
+  # Dirichlet Process
+  startvec.mean = mean(as.vector(startvec$start))
+  startvec.sd = sd(as.vector(startvec$start))
+  startvec.sd = ifelse( is.na(startvec.sd) | startvec.sd == 0, 1, startvec.sd) # This is for when there's 1 short peak or all samples have the exact same peak
+  startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
 
-    # Generating Data
-    OVERLAP.PEAKS.GR = GENEPEAKSGR[S4Vectors::queryHits(GenomicRanges::findOverlaps(GENEPEAKSGR, REDUCED.GENE.PEAKS.GR[i]))]
-    TILED.PEAKS.GR = GenomicRanges::tile(OVERLAP.PEAKS.GR, width = PARAMETERS$RESOLUTION)
-    startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
+  set.seed(PARAMETERS$SEED)
+  dp = dirichletprocess::DirichletProcessGaussian(
+    y = startvec.scaled,
+    g0Priors = c(0, 1, 1, 1),
+    alphaPriors = PARAMETERS$ALPHA.PRIORS)
 
-    # Dirichlet Process
-    startvec.mean = mean(as.vector(startvec$start))
-    startvec.sd = sd(as.vector(startvec$start))
-    startvec.sd = ifelse( is.na(startvec.sd) | startvec.sd == 0, 1, startvec.sd) # This is for when there's 1 short peak or all samples have the exact same peak
-    startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
+  dp = dirichletprocess::Fit(
+    dpObj = dp,
+    its = PARAMETERS$DP.ITERATIONS,
+    updatePrior = F,
+    progressBar = TRUE)
 
-    set.seed(PARAMETERS$SEED)
-    dp = dirichletprocess::DirichletProcessGaussian(
-      y = startvec.scaled,
-      g0Priors = c(0, 1, 1, 1),
-      alphaPriors = PARAMETERS$ALPHA.PRIORS)
+  # Examining Weights & Distributions of the GMM
+  dp_data = data.frame(
+    "i" = 1,
+    "Weights" = dp$weights,
+    "Mu" = c(dp$clusterParameters[[1]]),
+    "Sigma" = c(dp$clusterParameters[[2]]),
+    stringsAsFactors = F)
+  dp_data$Mu = (dp_data$Mu*startvec.sd)+startvec.mean
+  dp_data$Sigma = (dp_data$Sigma*startvec.sd)
 
-    dp = dirichletprocess::Fit(dpObj = dp,
-             its = PARAMETERS$DP.ITERATIONS,
-             updatePrior = F,
-             progressBar = TRUE)
+  # Generating Peaks
+  merged.peaks = .generate.peaks.from.gmm(dp_data, PARAMETERS, GENEINFO)
+  merged.peaks.rna = merged.peaks[[1]]
+  merged.peaks.genome = merged.peaks[[2]]
 
-    # Examining Weights & Distributions of the GMM
-    dp_data = data.frame(
-      "i" = i,
-      "Weights" = dp$weights,
-      "Mu" = c(dp$clusterParameters[[1]]),
-      "Sigma" = c(dp$clusterParameters[[2]]),
-      stringsAsFactors = F
-    )
-    dp_data$Mu = (dp_data$Mu*startvec.sd)+startvec.mean
-    dp_data$Sigma = (dp_data$Sigma*startvec.sd)
+  # Peak Coverage
+  PEAK.COVERAGE = GenomicRanges::coverage(GENEPEAKSGR)
+  BINS = unlist(GenomicRanges::tile(REDUCED.GENE.PEAKS.GR, width = 1))
+  BIN.COUNTS = data.frame(GenomicRanges::binnedAverage(BINS, PEAK.COVERAGE, "Coverage"), stringsAsFactors = F)
 
-    # Generating Peaks
-    merged.peaks = .generate.peaks.from.gmm(dp_data, PARAMETERS, GENEINFO)
-    merged.peaks.rna = merged.peaks[[1]]
-    merged.peaks.gen = merged.peaks[[2]]
-
-    # Peak Coverage
-    PEAK.COVERAGE = GenomicRanges::coverage(OVERLAP.PEAKS.GR)
-    BINS = GenomicRanges::tile(REDUCED.GENE.PEAKS.GR[i], width = 1)[[1]]
-    BIN.COUNTS = data.frame(GenomicRanges::binnedAverage(BINS, PEAK.COVERAGE, "Coverage"), stringsAsFactors = F)
-
-    # Plotting Data
-    x.norm <- seq(min(startvec.scaled), max(startvec.scaled), by=0.01)
-    y.fit <- data.frame(replicate(100, dirichletprocess::PosteriorFunction(dp)(x.norm)))
-    fit.frame <- data.frame(x=x.norm, y=rowMeans(y.fit))
-    fit.frame$x = (fit.frame$x*startvec.sd)+startvec.mean
-    fit.frame$y = fit.frame$y*max(BIN.COUNTS$Coverage)
-
-    # Updating Data
-    plot.startvec = rbind(plot.startvec, startvec)
-    plot.fit.frame = rbind(plot.fit.frame, fit.frame)
-    plot.bin.counts = rbind(plot.bin.counts, BIN.COUNTS)
-    plot.dp = rbind(plot.dp, dp_data)
-    plot.merged.peaks = c(plot.merged.peaks, merged.peaks.rna)
-    merged.peaks.genome = c(merged.peaks.genome, merged.peaks.gen)
-  }
+  # Plotting Data
+  x.norm <- seq(min(startvec.scaled), max(startvec.scaled), by=0.01)
+  y.fit <- data.frame(replicate(100, dirichletprocess::PosteriorFunction(dp)(x.norm)))
+  fit.frame <- data.frame(x=x.norm, y=rowMeans(y.fit))
+  fit.frame$x = (fit.frame$x*startvec.sd)+startvec.mean
+  fit.frame$y = fit.frame$y*max(BIN.COUNTS$Coverage)
 
   # Plotting DP data
   sample.points = seq(1, GENEINFO$exome_length, 10)
   scaling.factor = length(unique(PEAKSGR$sample))*100
   plot.dp.data = data.frame("sample.points" = sample.points, stringsAsFactors = F)
-  for(i in 1:nrow(plot.dp)){
-    norm.tmp = dnorm(sample.points, mean = plot.dp$Mu[i], sd = plot.dp$Sigma[i])*plot.dp$Weights[i]*scaling.factor
+  for(i in 1:nrow(dp_data)){
+    norm.tmp = dnorm(sample.points, mean = dp_data$Mu[i], sd = dp_data$Sigma[i])*dp_data$Weights[i]*scaling.factor
     plot.dp.data = cbind(plot.dp.data, norm.tmp)
   }
-  colnames(plot.dp.data) = c("sample.points", paste0("V", 1:nrow(plot.dp)))
+  colnames(plot.dp.data) = c("sample.points", paste0("V", 1:nrow(dp_data)))
 
   # Plotting
   if(PARAMETERS$PLOT.RESULT){
-    .plot.merged.peaks(plot.startvec, plot.fit.frame, plot.bin.counts, plot.merged.peaks, plot.dp.data, PARAMETERS)
+    .plot.merged.peaks(startvec, fit.frame, BIN.COUNTS, merged.peaks.rna, plot.dp.data, PARAMETERS)
   }
 
   # Return a Data Frame of Merged Peaks
