@@ -15,8 +15,6 @@ DPDE4PM(
   N.SD = 1,
   OUTPUTDIR = ".",
   PLOT.RESULT = F,
-  WRITE.OUTPUT = T,
-  OUTPUT.TAG = "",
   ALPHA.PRIORS = c(1, 2),
   SEED = 123
 )
@@ -53,10 +51,6 @@ DPDE4PM(
 \item{OUTPUTDIR}{Output directory}
 
 \item{PLOT.RESULT}{TRUE or FALSE, whether plots should be generated}
-
-\item{WRITE.OUTPUT}{TRUE or FALSE, whether an output file should be saved}
-
-\item{OUTPUT.TAG}{A character string indicating a tag to track the generated files}
 
 \item{ALPHA.PRIORS}{A length 2 numeric vector indicating alpha, beta of the Gamma distribution from which the concentration weight parameter alpha is drawn, see the R package dirichletprocess}
 

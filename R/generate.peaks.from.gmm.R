@@ -12,8 +12,6 @@
 #' }
 .generate.peaks.from.gmm = function(
   dp,
-  sample.mean,
-  sample.sd,
   PARAMETERS,
   GENEINFO
 ){
@@ -23,8 +21,7 @@
   dp_data = dp_data[dp_data$Weights > PARAMETERS$WEIGHT.THRESHOLD,]
   dp_data = dp_data[complete.cases(dp_data),]
   if(nrow(dp_data) == 0){
-    warning("No Peaks Survive Past The Weight Threshold or DP could not fit reasonable Gaussians. Consider Lowering Requirements or Tuning Parameters.",
-            call. = TRUE, domain = NULL)
+    warning("No Peaks Survive Past The Weight Threshold", call. = TRUE, domain = NULL)
     return(list(GenomicRanges::GRanges(),  GenomicRanges::GRanges()))
   }
   dp_data = dp_data[order(-dp_data$Weights),]

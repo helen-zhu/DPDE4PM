@@ -4,25 +4,10 @@
 \alias{.plot.merged.peaks}
 \title{Makes a plot of the merged peaks and the fitted curve}
 \usage{
-.plot.merged.peaks(
-  plot.startvec,
-  plot.fit.frame,
-  plot.bin.counts,
-  plot.merged.peaks,
-  plot.dp.data,
-  PARAMETERS
-)
+.plot.merged.peaks(plotting.data, plot.merged.peaks, PARAMETERS)
 }
 \arguments{
-\item{plot.startvec}{A data frame of the points surveyed}
-
-\item{plot.fit.frame}{A data frame with the fitted Dirichlet process model on the points in the startvec}
-
-\item{plot.bin.counts}{A data frame of the coverage at a base pair resolution}
-
 \item{plot.merged.peaks}{A GRanges object containing the RNA coordinates of the merged peaks in BED6 format}
-
-\item{plot.dp.data}{A data frame of individual normal distributions fitted}
 
 \item{PARAMETERS}{A PARAMETERS list with the parameters indicated in the DPDE4PM function}
 }

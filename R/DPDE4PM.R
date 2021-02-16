@@ -22,8 +22,6 @@
 #' @param WEIGHT.THRESHOLD A proportion (out of 1) used to determine the percentage of data accounted for by the GMM to be called a peak
 #' @param N.SD Number of standard deviations from the mean for each fitted Gaussian that should considered part of the joint peak
 #' @param PLOT.RESULT TRUE or FALSE, whether plots should be generated
-#' @param WRITE.OUTPUT TRUE or FALSE, whether an output file should be saved
-#' @param OUTPUT.TAG A character string indicating a tag to track the generated files
 #' @param ALPHA.PRIORS A length 2 numeric vector indicating alpha, beta of the Gamma distribution from which the concentration weight parameter alpha is drawn, see the R package dirichletprocess
 #' @param SEED a seed for reproducibility
 #'
@@ -48,8 +46,6 @@ DPDE4PM = function(
   N.SD = 1,
   OUTPUTDIR =".",
   PLOT.RESULT=F,
-  WRITE.OUTPUT=T,
-  OUTPUT.TAG="",
   ALPHA.PRIORS = c(1,2),
   SEED = 123
 ){
@@ -69,17 +65,22 @@ DPDE4PM = function(
   PARAMETERS$ALPHA.PRIORS = ALPHA.PRIORS
   PARAMETERS$SEED = SEED
 
-  # Error messages
+  # Check if peaks are in the right format
+
+  # Creating a list of samples
+  ALL.SAMPLES = sort(unique(PEAKS$sample))
+  PARAMETERS$ALL.SAMPLES = ALL.SAMPLES
+
   # Check if OUTPUTDIR exists
   if(!dir.exists(PARAMETERS$OUTPUTDIR)){
     dir.create(PARAMETERS$OUTPUTDIR, recursive = T)
   }
-  # 2. Check if peaks are in the right format
-  # 3. Check if gene is in peaks & gtf
 
-  # Making a vector of all samples so that the output is consistent
-  ALL.SAMPLES = sort(unique(PEAKS$sample))
-  PARAMETERS$ALL.SAMPLES = ALL.SAMPLES
+  # If the gene doesn't have peaks
+  if(PARAMETERS$GENE %in% PEAKS$name){
+    warning("No Peaks are Found for This Gene in PEAKS!", call. = TRUE, domain = NULL)
+    return(.generate.null.result(PARAMETERS))
+  }
 
   # Turning PEAKS into a GRanges Object
   PEAKSGR = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = PARAMETERS$GENE, DF = F)
@@ -105,9 +106,6 @@ DPDE4PM = function(
   GENEPEAKSGR = S4Vectors::split(GENEPEAKSGR, GENEPEAKSGR$sample)
   GENEPEAKSGR = unlist(GenomicRanges::reduce(GENEPEAKSGR))
 
-  # Creating some big peaks
-  REDUCED.GENE.PEAKS.GR = reduce(GENEPEAKSGR)
-
   # Examining Weights & Distributions of the GMM
   dp = .dpc.peaks(GENEPEAKSGR, PARAMETERS)
 
@@ -118,15 +116,13 @@ DPDE4PM = function(
   # Plotting
   if(PARAMETERS$PLOT.RESULT){
     plotting.data = .generate.merged.peaks.plotting(dp, GENEINFO, GENEPEAKSGR)
-    .plot.merged.peaks(startvec, fit.frame, BIN.COUNTS, merged.peaks.rna, plot.dp.data, PARAMETERS)
+    .plot.merged.peaks(plotting.data, merged.peaks.rna, PARAMETERS)
   }
 
   # Return a Data Frame of Merged Peaks
   if(length(merged.peaks.genome) == 0){
-    output.ncol = length(PARAMETERS$ALL.SAMPLES) + 12
-    OUTPUT_TABLE = data.frame(matrix(ncol = output.ncol, nrow = 0))
-    names(OUTPUT_TABLE) = c("chr", "start", "end", "name", "score", "strand", "thickStart", "thickEnd",
-                            "itemRgb", "blockCount", "blockSizes","blockStarts", PARAMETERS$ALL.SAMPLES)
+    warning("No Peaks are Found for This Gene After Fitting!", call. = TRUE, domain = NULL)
+    OUTPUT.TABLE = .generate.null.result(PARAMETERS)
   } else {
 
     # Creating a BED12 File
@@ -139,18 +135,6 @@ DPDE4PM = function(
     # Write Output Tables & Return Files
     OUTPUT.TABLE = merge(PEAKS.FINAL, SAMPLE.PVAL, by = "peak", all = T)
     OUTPUT.TABLE = OUTPUT.TABLE[,colnames(OUTPUT.TABLE) != "peak"]
-  }
-
-  if(PARAMETERS$WRITE.OUTPUT){
-    filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".MergedPeaks.tsv")
-    write.table(
-      OUTPUT.TABLE,
-      file = filename,
-      sep = "\t",
-      col.names = T,
-      row.names = F,
-      quote = F
-    )
   }
 
   return(OUTPUT.TABLE)

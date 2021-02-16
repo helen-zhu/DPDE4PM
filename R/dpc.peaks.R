@@ -2,14 +2,15 @@
 .dpc.peaks = function(GENEPEAKSGR, PARAMETERS){
   
   # Sampling from the set of peaks
-  TILED.PEAKS.GR = GenomicRanges::tile(GENEPEAKSGR, width = PARAMETERS$RESOLUTION)
-  startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
+  TILED.PEAKS.GR = unlist(GenomicRanges::tile(GENEPEAKSGR, width = PARAMETERS$RESOLUTION))
   
   # Normalizing Data
-  startvec.mean = mean(as.vector(startvec$start))
-  startvec.sd = sd(as.vector(startvec$start))
-  startvec.sd = ifelse( is.na(startvec.sd) | startvec.sd == 0, 1, startvec.sd) # This is for when there's 1 short peak or all samples have the exact same peak
-  startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
+  startvec = GenomicRanges::start(TILED.PEAKS.GR)
+  startvec.mean = mean(startvec)
+  startvec.sd = sd(startvec)
+  # This is for when there's 1 short peak or all samples have the exact same peak (Fix this at some point)
+  startvec.sd = ifelse( is.na(startvec.sd) | startvec.sd == 0, 1, startvec.sd) 
+  startvec.scaled = (startvec - startvec.mean)/startvec.sd
   
   # Running Dirichlet Process
   set.seed(PARAMETERS$SEED)
@@ -33,6 +34,7 @@
   dp_data$Mu = (dp_data$Mu*startvec.sd)+startvec.mean
   dp_data$Sigma = (dp_data$Sigma*startvec.sd)
   
-  return(list("dp" = dp, "dp_data" = dp_data, "startvec.scaled" = startvec.scaled, "startvec.mean" = startvec.mean, "startvec.sd" = startvec.sd))
+  return(list("dp" = dp, "dp_data" = dp_data, "startvec" = startvec, "startvec.scaled" = startvec.scaled, "startvec.mean" = startvec.mean, "startvec.sd" = startvec.sd))
   
 }
+

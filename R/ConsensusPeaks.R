@@ -17,5 +17,18 @@ ConsensusPeaks = function(
   ALPHA.PRIORS = c(1,2),
   SEED = 123
 ) {
-  
+
+
+  if(PARAMETERS$WRITE.OUTPUT){
+    filename = paste0(PARAMETERS$OUTPUTDIR, "/", PARAMETERS$GENE, ".", PARAMETERS$OUTPUT.TAG, ".MergedPeaks.tsv")
+    write.table(
+      OUTPUT.TABLE,
+      file = filename,
+      sep = "\t",
+      col.names = T,
+      row.names = F,
+      quote = F
+    )
+  }
+  # Return something
 }

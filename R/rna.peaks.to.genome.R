@@ -2,6 +2,7 @@
 
 .rna.peaks.to.genome = function(merged.peaks.rna, GENEINFO){
   
+  # Return an empty GRanges if no peaks survive
   if(length(merged.peaks.rna) == 0){
     return(GenomicRanges::GRanges())
   }
