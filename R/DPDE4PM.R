@@ -113,7 +113,7 @@ DPDE4PM = function(
 
   # Plotting
   if(PARAMETERS$PLOT.RESULT){
-    plotting.data = .generate.merged.peaks.plotting(dp, GENEINFO, GENEPEAKSGR)
+    plotting.data = .generate.merged.peaks.plotting(dp, PARAMETERS, GENEINFO, GENEPEAKSGR)
     .plot.merged.peaks(plotting.data, merged.peaks.rna, PARAMETERS)
   }
 

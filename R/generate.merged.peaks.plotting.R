@@ -1,6 +1,6 @@
 
 
-.generate.merged.peaks.plotting = function(dp, GENEINFO, GENEPEAKSGR){
+.generate.merged.peaks.plotting = function(dp, PARAMETERS, GENEINFO, GENEPEAKSGR){
 
   # Peak Coverage
   REDUCED.GENE.PEAKS.GR = reduce(GENEPEAKSGR)
@@ -18,7 +18,7 @@
   # Plotting DP data
   dp_data = dp[['dp_data']]
   sample.points = seq(1, GENEINFO$exome_length, 10)
-  scaling.factor = length(unique(PEAKSGR$sample))*100
+  scaling.factor = length(PARAMETERS$ALL.SAMPLES)*100
   plot.dp.data = data.frame("sample.points" = sample.points, stringsAsFactors = F)
   for(i in 1:nrow(dp_data)){
     norm.tmp = dnorm(sample.points, mean = dp_data$Mu[i], sd = dp_data$Sigma[i])*dp_data$Weights[i]*scaling.factor
