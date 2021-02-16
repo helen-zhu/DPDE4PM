@@ -108,67 +108,16 @@ DPDE4PM = function(
   # Creating some big peaks
   REDUCED.GENE.PEAKS.GR = reduce(GENEPEAKSGR)
 
-  # Generating Data
-  TILED.PEAKS.GR = GenomicRanges::tile(GENEPEAKSGR, width = PARAMETERS$RESOLUTION)
-  startvec = data.frame(TILED.PEAKS.GR, stringsAsFactors = F)
-
-  # Dirichlet Process
-  startvec.mean = mean(as.vector(startvec$start))
-  startvec.sd = sd(as.vector(startvec$start))
-  startvec.sd = ifelse( is.na(startvec.sd) | startvec.sd == 0, 1, startvec.sd) # This is for when there's 1 short peak or all samples have the exact same peak
-  startvec.scaled = (as.vector(startvec$start) - startvec.mean)/startvec.sd
-
-  set.seed(PARAMETERS$SEED)
-  dp = dirichletprocess::DirichletProcessGaussian(
-    y = startvec.scaled,
-    g0Priors = c(0, 1, 1, 1),
-    alphaPriors = PARAMETERS$ALPHA.PRIORS)
-
-  dp = dirichletprocess::Fit(
-    dpObj = dp,
-    its = PARAMETERS$DP.ITERATIONS,
-    updatePrior = F,
-    progressBar = TRUE)
-
   # Examining Weights & Distributions of the GMM
-  dp_data = data.frame(
-    "i" = 1,
-    "Weights" = dp$weights,
-    "Mu" = c(dp$clusterParameters[[1]]),
-    "Sigma" = c(dp$clusterParameters[[2]]),
-    stringsAsFactors = F)
-  dp_data$Mu = (dp_data$Mu*startvec.sd)+startvec.mean
-  dp_data$Sigma = (dp_data$Sigma*startvec.sd)
+  dp = .dpc.peaks(GENEPEAKSGR, PARAMETERS)
 
   # Generating Peaks
-  merged.peaks = .generate.peaks.from.gmm(dp_data, PARAMETERS, GENEINFO)
-  merged.peaks.rna = merged.peaks[[1]]
-  merged.peaks.genome = merged.peaks[[2]]
-
-  # Peak Coverage
-  PEAK.COVERAGE = GenomicRanges::coverage(GENEPEAKSGR)
-  BINS = unlist(GenomicRanges::tile(REDUCED.GENE.PEAKS.GR, width = 1))
-  BIN.COUNTS = data.frame(GenomicRanges::binnedAverage(BINS, PEAK.COVERAGE, "Coverage"), stringsAsFactors = F)
-
-  # Plotting Data
-  x.norm <- seq(min(startvec.scaled), max(startvec.scaled), by=0.01)
-  y.fit <- data.frame(replicate(100, dirichletprocess::PosteriorFunction(dp)(x.norm)))
-  fit.frame <- data.frame(x=x.norm, y=rowMeans(y.fit))
-  fit.frame$x = (fit.frame$x*startvec.sd)+startvec.mean
-  fit.frame$y = fit.frame$y*max(BIN.COUNTS$Coverage)
-
-  # Plotting DP data
-  sample.points = seq(1, GENEINFO$exome_length, 10)
-  scaling.factor = length(unique(PEAKSGR$sample))*100
-  plot.dp.data = data.frame("sample.points" = sample.points, stringsAsFactors = F)
-  for(i in 1:nrow(dp_data)){
-    norm.tmp = dnorm(sample.points, mean = dp_data$Mu[i], sd = dp_data$Sigma[i])*dp_data$Weights[i]*scaling.factor
-    plot.dp.data = cbind(plot.dp.data, norm.tmp)
-  }
-  colnames(plot.dp.data) = c("sample.points", paste0("V", 1:nrow(dp_data)))
+  merged.peaks.rna = .generate.peaks.from.gmm(dp = dp, PARAMETERS, GENEINFO)
+  merged.peaks.genome = .rna.peaks.to.genome(merged.peaks.rna, GENEINFO)
 
   # Plotting
   if(PARAMETERS$PLOT.RESULT){
+    plotting.data = .generate.merged.peaks.plotting(dp, GENEINFO, GENEPEAKSGR)
     .plot.merged.peaks(startvec, fit.frame, BIN.COUNTS, merged.peaks.rna, plot.dp.data, PARAMETERS)
   }
 
@@ -182,10 +131,10 @@ DPDE4PM = function(
 
     # Creating a BED12 File
     GenomicRanges::start(merged.peaks.genome) = GenomicRanges::start(merged.peaks.genome)-1
-    PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome, ID.COLS = c("name", "i", "j"))
+    PEAKS.FINAL = .bed6tobed12(MERGED.PEAKS = merged.peaks.genome, ID.COLS = c("name", "i"))
 
     # Merging P-Values
-    SAMPLE.PVAL = .merge.p(PEAKSGR, MERGED.PEAKS = merged.peaks.genome, ANNOTATION, PARAMETERS, ID.COLS = c("name", "i", "j"))
+    SAMPLE.PVAL = .merge.p(PEAKSGR, MERGED.PEAKS = merged.peaks.genome, ANNOTATION, PARAMETERS, ID.COLS = c("name", "i"))
 
     # Write Output Tables & Return Files
     OUTPUT.TABLE = merge(PEAKS.FINAL, SAMPLE.PVAL, by = "peak", all = T)

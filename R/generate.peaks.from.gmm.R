@@ -11,12 +11,15 @@
 #'  \item{merged.peaks.filtered.genome}{A merged peaks GenomicRanges object in genomic coordinates}
 #' }
 .generate.peaks.from.gmm = function(
-  dp_data,
+  dp,
+  sample.mean,
+  sample.sd,
   PARAMETERS,
   GENEINFO
 ){
 
   # Filtering by Threshold
+  dp_data = dp[['dp_data']]
   dp_data = dp_data[dp_data$Weights > PARAMETERS$WEIGHT.THRESHOLD,]
   dp_data = dp_data[complete.cases(dp_data),]
   if(nrow(dp_data) == 0){
@@ -34,8 +37,7 @@
     "name" = GENEINFO$gene,
     "strand" = GENEINFO$strand,
     "weights" = dp_data$Weights,
-    "i" = dp_data$i,
-    "j" = seq(1, nrow(dp_data), 1),
+    "i" = seq(1, nrow(dp_data), 1),
     stringsAsFactors = F
   )
   merged.peaks$start = ifelse(merged.peaks$start < 1, 1, merged.peaks$start)
@@ -65,29 +67,9 @@
   }
 
   # Removing peaks that are below resolution
-  # wid = IRanges::width(merged.peaks.filtered.rna)
-  # remove.elements = which(wid < PARAMETERS$RESOLUTION)
-  # merged.peaks.filtered.rna = merged.peaks.filtered.rna[!1:length(merged.peaks.filtered.rna) %in% remove.elements]
-  # if(length(merged.peaks.filtered.rna) == 0){
-  #   warning("No Peaks Survive After The Width Filter",
-  #           call. = TRUE, domain = NULL)
-  #   return(list(GenomicRanges::GRanges(),  GenomicRanges::GRanges()))
-  # }
+  wid = IRanges::width(merged.peaks.filtered.rna)
+  remove.elements = which(wid < PARAMETERS$RESOLUTION)
+  merged.peaks.filtered.rna = merged.peaks.filtered.rna[!1:length(merged.peaks.filtered.rna) %in% remove.elements]
 
-  # Transferring to Genomic Coordinates
-  merged.peaks.genome = merged.peaks.filtered.rna
-  GenomicRanges::end(merged.peaks.genome) = GENEINFO$RNA2DNA[GenomicRanges::end(merged.peaks.genome)]
-  GenomicRanges::start(merged.peaks.genome) = GENEINFO$RNA2DNA[GenomicRanges::start(merged.peaks.genome)]
-  anno_gr = GenomicRanges::makeGRangesFromDataFrame(GENEINFO$anno)
-
-  # Filtering Out Introns
-  merged.peaks.filtered.genome = GenomicRanges::GRanges()
-  for(i in 1:length(merged.peaks.genome)){
-    tmp.gr = GenomicRanges::intersect(merged.peaks.genome[i], anno_gr)
-    if(length(tmp.gr) > 0){S4Vectors::mcols(tmp.gr) = S4Vectors::mcols(merged.peaks.genome[i])}
-    merged.peaks.filtered.genome = c(merged.peaks.filtered.genome, tmp.gr)
-  }
-
-
-  return(list(merged.peaks.filtered.rna, merged.peaks.filtered.genome))
+  return(merged.peaks.filtered.rna)
 }
