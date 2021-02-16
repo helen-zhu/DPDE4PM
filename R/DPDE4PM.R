@@ -40,7 +40,7 @@
 DPDE4PM = function(
   GENE,
   PEAKS,
-  GTF,
+  GTF = NULL,
   ANNOTATION = NULL,
   RESOLUTION = 50,
   DP.ITERATIONS = 1000,
