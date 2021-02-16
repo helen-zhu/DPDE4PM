@@ -36,7 +36,7 @@
     ggplot2::ggtitle(PARAMETERS$GENE) +
     ggplot2::ylab("Coverage (at BP resolution)") +
     ggplot2::xlab("Transcript Coordinate") +
-    ggplot2::annotate("rect", xmin=GenomicRanges::start(plot.merged.peaks), xmax=GenomicRanges::end(plot.merged.peaks), ymin=-1 , ymax=-0.1, alpha=0.5, color="black", fill=length(merged.peaks.df))
+    ggplot2::annotate("rect", xmin=GenomicRanges::start(plot.merged.peaks), xmax=GenomicRanges::end(plot.merged.peaks), ymin=-1 , ymax=-0.1, alpha=0.5, color="black", fill=length(plot.merged.peaks))
 
   p2 = p2 + geom_line(data = melted.plot.dp.data, ggplot2::aes(x=sample.points, y=value, color = variable)) +
     theme(legend.position = "none")
