@@ -75,7 +75,7 @@ DPDE4PM = function(
   }
 
   # If the gene doesn't have peaks
-  if(PARAMETERS$GENE %in% PEAKS$name){
+  if(!PARAMETERS$GENE %in% PEAKS$name){
     warning("No Peaks are Found for This Gene in PEAKS!", call. = TRUE, domain = NULL)
     return(.generate.null.result(PARAMETERS))
   }
