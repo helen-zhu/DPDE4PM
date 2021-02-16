@@ -16,6 +16,7 @@
 #'   \item{sample}{sample_id of samples}
 #' }
 #' @param GTF The GTF file used to generate the peaks. This is used to determine the genomic coordinates of the gene.
+#' @param ANNOTATION
 #' @param OUTPUTDIR Output directory
 #' @param OUTPUT.TAG A character string indicating a tag to track the generated files
 #' @param PLOT Binary T or F indicating whether to save plot or just return plot
@@ -26,7 +27,8 @@
 plot.gene.peaks = function(
   GENE,
   PEAKS,
-  GTF,
+  GTF = NULL,
+  ANNOTATION = NULL,
   OUTPUTDIR = ".",
   OUTPUT.TAG = "",
   PLOT = T
@@ -40,7 +42,13 @@ plot.gene.peaks = function(
   PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
 
   # Import GTF as a GRanges Object
-  ANNOTATION = .read.gtf(PARAMETERS)
+  annot.format = F
+  if(!is.null(ANNOTATION)){
+    annot.format = .check.annotation(ANNOTATION, PEAKSGR, GENE = PARAMETERS$GENE)
+  }
+  if(!annot.format){
+    ANNOTATION = read.gtf(PARAMETERS)
+  }
 
   # Plotting Peaks
   plotting.peaks = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = PARAMETERS$GENE, DF = T)
