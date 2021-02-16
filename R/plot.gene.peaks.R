@@ -41,6 +41,9 @@ plot.gene.peaks = function(
   PARAMETERS$OUTPUTDIR = OUTPUTDIR
   PARAMETERS$OUTPUT.TAG = OUTPUT.TAG
 
+  # PEAKSGR
+  PEAKSGR = .retrieve.peaks.as.granges(PEAKS = PEAKS, GENE = PARAMETERS$GENE, DF = F)
+
   # Import GTF as a GRanges Object
   annot.format = F
   if(!is.null(ANNOTATION)){
